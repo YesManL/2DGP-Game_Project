@@ -1,0 +1,14 @@
+Vehicle_S_4.png
+size:914,608
+filter:Linear,Linear
+pma:true
+Vehicle_S_4_Chasis
+bounds:2,2,604,782
+offsets:148,246,900,1200
+rotate:90
+Vehicle_S_4_Tire_1
+bounds:786,92,79,256
+offsets:12,25,105,315
+Vehicle_S_4_Tire_2
+bounds:786,350,126,256
+offsets:33,30,176,311

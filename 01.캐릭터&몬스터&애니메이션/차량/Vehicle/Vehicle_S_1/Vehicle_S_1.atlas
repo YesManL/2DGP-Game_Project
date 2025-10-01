@@ -1,0 +1,11 @@
+Vehicle_S_1.png
+size:1129,660
+filter:Linear,Linear
+pma:true
+Vehicle_S_1_Chassis_1
+bounds:2,2,656,1011
+offsets:122,97,900,1200
+rotate:90
+Vehicle_S_1_Tire_1
+bounds:1015,454,112,204
+offsets:3,11,126,226

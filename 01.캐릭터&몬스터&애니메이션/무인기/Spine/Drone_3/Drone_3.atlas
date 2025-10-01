@@ -1,0 +1,11 @@
+Drone_3.png
+size:621,183
+filter:Linear,Linear
+pma:true
+Drone_3_Base
+bounds:2,59,122,395
+offsets:189,73,500,500
+rotate:90
+Drone_3_Wing
+bounds:399,2,220,179
+offsets:6,7,240,192

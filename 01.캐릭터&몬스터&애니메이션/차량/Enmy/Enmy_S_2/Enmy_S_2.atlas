@@ -1,0 +1,14 @@
+Enmy_S_2.png
+size:889,454
+filter:Linear,Linear
+pma:true
+Enmy_S_2_Chasis
+bounds:2,2,450,792
+offsets:225,246,900,1200
+rotate:90
+Enmy_S_2_Tire_1
+bounds:796,48,65,170
+offsets:7,5,78,180
+Enmy_S_2_Tire_2
+bounds:796,220,91,232
+offsets:8,9,110,252

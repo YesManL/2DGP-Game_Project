@@ -1,0 +1,15 @@
+Vehicle_S_2.png
+size:1137,456
+filter:Linear,Linear
+pma:true
+Vehicle_S_2_Chassis_1
+bounds:2,2,452,926
+offsets:224,196,900,1200
+rotate:90
+Vehicle_S_2_Tire_1
+bounds:930,57,114,205
+offsets:32,29,186,252
+rotate:90
+Vehicle_S_2_Tire_2
+bounds:930,173,156,281
+offsets:63,38,266,358

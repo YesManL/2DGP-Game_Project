@@ -1,0 +1,11 @@
+Vehicle_S_3.png
+size:1191,614
+filter:Linear,Linear
+pma:true
+Vehicle_S_3_Chasis
+bounds:2,2,610,1071
+offsets:145,96,900,1200
+rotate:90
+Vehicle_S_3_Tire_1
+bounds:1075,406,114,206
+offsets:4,2,124,210

@@ -1,0 +1,15 @@
+Vehicle_L_1.png
+size:1859,896
+filter:Linear,Linear
+pma:true
+Vehicle_L_1_Chasis_1
+bounds:2,234,660,1855
+offsets:370,97,1400,2000
+rotate:90
+Vehicle_L_1_Tire_1
+bounds:861,3,229,450
+offsets:21,32,279,514
+rotate:90
+Vehicle_L_1_Tire_2
+bounds:2,2,230,857
+rotate:90

@@ -1,0 +1,7 @@
+Vehicle_M_4.png
+size:762,1135
+filter:Linear,Linear
+pma:true
+Vehicle_M_4_Chasis
+bounds:2,2,758,1131
+offsets:373,213,1500,1500
