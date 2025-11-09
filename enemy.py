@@ -6,7 +6,7 @@ import math
 class Enemy:
     def __init__(self, x, y, target):
         self.x, self.y = x, y
-        self.width, self.height = 30, 30
+        self.width, self.height = 30, 30  # 크기 고정
         self.speed = 50
         self.target = target
         self.hp = 30
@@ -34,30 +34,33 @@ class Enemy:
     def draw(self):
         # 피격 시 더 밝은 빨간색으로 표시
         if self.hit_flash > 0:
-            # 빨간색으로 깜빡임 (피격 표시)
             pass
 
-        # 빨간색 사각형으로 표시
+        # 빨간색 사각형으로 표시 (크기 고정 15픽셀)
         draw_rectangle(self.x - 15, self.y - 15, self.x + 15, self.y + 15)
 
         # HP 바 표시
         hp_ratio = self.hp / self.max_hp
         if hp_ratio < 1.0:
             # HP 바 배경
-            draw_rectangle(self.x - 15, self.y + 20, self.x + 15, self.y + 23)
+            bar_y = self.y + 20
+            draw_rectangle(self.x - 15, bar_y, self.x + 15, bar_y + 3)
             # HP 바
             if hp_ratio > 0:
                 bar_width = 30 * hp_ratio
-                draw_rectangle(self.x - 15, self.y + 20, self.x - 15 + bar_width, self.y + 23)
+                draw_rectangle(self.x - 15, bar_y, self.x - 15 + bar_width, bar_y + 3)
 
     def get_bb(self):
+        # 충돌 박스도 고정 크기로
         return self.x - 15, self.y - 15, self.x + 15, self.y + 15
 
     def handle_collision(self, group, other):
         if group == 'player:enemy':
             pass
         elif group == 'bullet:enemy':
-            self.hp -= 10
+            # 총알의 데미지만큼 HP 감소
+            damage = other.damage if hasattr(other, 'damage') else 10
+            self.hp -= damage
             self.hit_flash = 0.1  # 0.1초간 피격 표시
             if self.hp <= 0 and not self.is_dead:
                 # 적이 죽으면 카운트 증가 (한 번만)
