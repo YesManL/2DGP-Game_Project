@@ -7,6 +7,7 @@ class UI:
         self.font = load_font('C:/Windows/Fonts/arial.ttf', 20)
         self.wave = 1
         self.enemies_killed = 0
+        self.enemies_needed = 0  # 웨이브 완료까지 남은 적 수
 
     def update(self):
         pass
@@ -30,7 +31,11 @@ class UI:
             draw_rectangle(bar_x, bar_y, bar_x + bar_width * hp_ratio, bar_y + bar_height)
 
         # 웨이브 정보
-        self.font.draw(get_canvas_width() - 150, get_canvas_height() - 30, f'Wave: {self.wave}', (255, 255, 255))
+        self.font.draw(get_canvas_width() - 200, get_canvas_height() - 30, f'Wave: {self.wave}', (255, 255, 255))
 
-        # 적 처치 수
-        self.font.draw(get_canvas_width() - 150, get_canvas_height() - 60, f'Kills: {self.enemies_killed}', (255, 255, 255))
+        # 적 처치 수 및 필요한 수
+        self.font.draw(get_canvas_width() - 200, get_canvas_height() - 60, f'Kills: {self.enemies_killed}', (255, 255, 255))
+
+        # 웨이브 완료까지 남은 적 수
+        if self.enemies_needed > 0:
+            self.font.draw(get_canvas_width() - 200, get_canvas_height() - 90, f'Next: {self.enemies_needed}', (255, 255, 0))
