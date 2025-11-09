@@ -4,10 +4,11 @@ import game_world
 import math
 
 class Bullet:
-    def __init__(self, x, y, angle, speed=300):
+    def __init__(self, x, y, angle, speed=300, damage=10):
         self.x, self.y = x, y
         self.angle = angle
         self.speed = speed
+        self.damage = damage  # 데미지 추가
         self.width, self.height = 5, 5
 
         # 각도를 라디안으로 변환하여 방향 계산
@@ -33,4 +34,3 @@ class Bullet:
     def handle_collision(self, group, other):
         if group == 'bullet:enemy':
             game_world.remove_object(self)
-

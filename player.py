@@ -5,7 +5,7 @@ import math
 
 # Player 이동 속도 설정
 PIXEL_PER_METER = (10.0 / 0.3)
-RUN_SPEED_KMPH = 30.0
+RUN_SPEED_KMPH = 15.0  # 30에서 15로 절반으로 감소!
 RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
 RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
 RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
@@ -24,9 +24,7 @@ class Player:
 
         try:
             self.image = load_image('./01.캐릭터&몬스터&애니메이션/차량/Vehicle/Vehicle_M_1/Vehicle_M_1_Chasis.png')
-            # 이미지가 너무 크면 스케일 다운
         except:
-            # 이미지 로드 실패 시 기본 크기 사용
             pass
 
         self.hp = 100
@@ -36,6 +34,11 @@ class Player:
         self.is_firing = False  # 마우스 버튼이 눌려있는지
         self.invincible_time = 0  # 무적 시간
         self.invincible_duration = 1.0  # 1초 무적
+
+        # 업그레이드 가능한 스탯들
+        self.bullet_damage = 10  # 총알 데미지
+        self.bullet_speed = 300  # 총알 속도
+        self.level = 1
 
     def update(self):
         # 이동 처리
@@ -109,7 +112,7 @@ class Player:
     def fire(self):
         if self.fire_cooldown <= 0:
             from bullet import Bullet
-            bullet = Bullet(self.x, self.y, self.angle)
+            bullet = Bullet(self.x, self.y, self.angle, self.bullet_speed, self.bullet_damage)
             game_world.add_object(bullet, 2)
             self.fire_cooldown = self.fire_rate
 
@@ -120,3 +123,9 @@ class Player:
         if group == 'player:enemy' and self.invincible_time <= 0:
             self.hp -= 5
             self.invincible_time = self.invincible_duration
+
+    def reset_input_state(self):
+        """입력 상태 초기화 - 업그레이드 화면 후 호출"""
+        self.dir_x = 0
+        self.dir_y = 0
+        self.is_firing = False
