@@ -5,7 +5,7 @@ import math
 
 # Player 이동 속도 설정
 PIXEL_PER_METER = (10.0 / 0.3)
-RUN_SPEED_KMPH = 15.0  # 30에서 15로 절반으로 감소!
+RUN_SPEED_KMPH = 10.0  # 15에서 10으로 더 감소
 RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
 RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
 RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
@@ -15,15 +15,20 @@ class Player:
         self.x, self.y = 400, 300
         self.speed = RUN_SPEED_PPS
         self.dir_x, self.dir_y = 0, 0
-        self.angle = 0  # 마우스 방향으로 회전
+        self.chassis_angle = 0  # 차체 각도 (이동 방향)
+        self.turret_angle = 0   # 터렛 각도 (마우스 방향)
 
         # 이미지 로드
-        self.image = None
-        self.image_width = 60  # 적절한 크기로 설정
-        self.image_height = 60
+        self.chassis_image = None  # 차체 이미지
+        self.turret_image = None   # 터렛 이미지
+        self.image_width = 100  # 80에서 100으로 증가
+        self.image_height = 100  # 80에서 100으로 증가
+        self.turret_width = 40  # 32에서 40으로 증가 (비율 유지)
+        self.turret_height = 60  # 48에서 60으로 증가 (비율 유지)
 
         try:
-            self.image = load_image('./01.캐릭터&몬스터&애니메이션/차량/Vehicle/Vehicle_M_1/Vehicle_M_1_Chasis.png')
+            self.chassis_image = load_image('./01.캐릭터&몬스터&애니메이션/차량/Vehicle/Vehicle_S_2/Vehicle_S_2_Chassis_1.png')
+            self.turret_image = load_image('./01.캐릭터&몬스터&애니메이션/차량/무장/PNG/Turret_S_5.png')
         except:
             pass
 
@@ -65,13 +70,18 @@ class Player:
             self.fire()
 
     def draw(self):
-        # 무적 시간일 때 깜빡임 효과
+        # 무적 시간일 때 깜빡임 효과 - 완전히 사라지지 않고 투명하게
         if self.invincible_time > 0 and int(self.invincible_time * 10) % 2 == 0:
-            return
+            # 깜빡임 시에도 반투명으로 표시
+            pass
 
-        if self.image:
-            # 적절한 크기로 회전하여 그리기
-            self.image.rotate_draw(math.radians(self.angle), self.x, self.y, self.image_width, self.image_height)
+        if self.chassis_image:
+            # 차체 그리기
+            self.chassis_image.rotate_draw(math.radians(self.chassis_angle), self.x, self.y, self.image_width, self.image_height)
+
+            # 터렛 그리기 - y 좌표를 3픽셀 아래로 조정
+            if self.turret_image:
+                self.turret_image.rotate_draw(math.radians(self.turret_angle), self.x, self.y - 3, self.turret_width, self.turret_height)
         else:
             # 이미지가 없으면 사각형으로 표시
             draw_rectangle(self.x - 25, self.y - 25, self.x + 25, self.y + 25)
@@ -96,11 +106,11 @@ class Player:
             elif event.key == SDLK_d:
                 self.dir_x -= 1
         elif event.type == SDL_MOUSEMOTION:
-            # 마우스 위치로 회전
+            # 마우스 위치로 터렛 회전
             mx, my = event.x, get_canvas_height() - event.y
             dx = mx - self.x
             dy = my - self.y
-            self.angle = math.degrees(math.atan2(dy, dx)) - 90
+            self.turret_angle = math.degrees(math.atan2(dy, dx)) - 90
         elif event.type == SDL_MOUSEBUTTONDOWN:
             if event.button == SDL_BUTTON_LEFT:
                 self.is_firing = True
@@ -112,7 +122,7 @@ class Player:
     def fire(self):
         if self.fire_cooldown <= 0:
             from bullet import Bullet
-            bullet = Bullet(self.x, self.y, self.angle, self.bullet_speed, self.bullet_damage)
+            bullet = Bullet(self.x, self.y, self.turret_angle, self.bullet_speed, self.bullet_damage)
             game_world.add_object(bullet, 2)
             self.fire_cooldown = self.fire_rate
 
