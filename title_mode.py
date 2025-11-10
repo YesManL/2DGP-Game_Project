@@ -29,7 +29,10 @@ def handle_events():
 def draw():
     clear_canvas()
     if image:
-        image.draw(get_canvas_width() // 2, get_canvas_height() // 2)
+        # 로고 크기를 화면의 60% 크기로 조정
+        logo_width = get_canvas_width() * 0.6
+        logo_height = get_canvas_height() * 0.6
+        image.draw(get_canvas_width() // 2, get_canvas_height() // 2, logo_width, logo_height)
     else:
         font.draw(get_canvas_width() // 2 - 150, get_canvas_height() // 2, 'SAND RAIDER', (255, 255, 255))
 
