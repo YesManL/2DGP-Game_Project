@@ -84,7 +84,8 @@ def apply_upgrade(upgrade_key):
     elif upgrade_key == 'fire_rate':
         player.fire_rate *= 0.8  # 발사 간격 감소 = 연사속도 증가
     elif upgrade_key == 'speed':
-        player.speed *= 1.15
+        player.max_speed *= 1.15  # 후륜 자동차 시스템의 최대 속도 증가
+        player.speed *= 1.15  # 기존 speed 변수도 같이 증가 (호환성)
     elif upgrade_key == 'max_hp':
         player.max_hp += 20
         player.hp = min(player.hp + 20, player.max_hp)
