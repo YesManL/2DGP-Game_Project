@@ -2,11 +2,14 @@ from pico2d import *
 import game_framework
 import title_mode
 
+# 모듈 레벨 변수
+font = None
+score = 0
+
 def init():
-    global font, score
+    global font
     # Windows 기본 폰트 사용
     font = load_font('C:/Windows/Fonts/arial.ttf', 40)
-    score = 0
 
 def finish():
     pass

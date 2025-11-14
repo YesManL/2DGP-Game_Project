@@ -61,7 +61,8 @@ def update():
     # 플레이어가 죽었는지 체크
     if player.hp <= 0:
         import gameover_mode
-        gameover_mode.set_score(enemies_killed)
+        # gameover_mode의 score를 직접 설정
+        gameover_mode.score = enemies_killed
         game_framework.change_mode(gameover_mode)
         return
 
