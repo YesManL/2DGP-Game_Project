@@ -249,6 +249,11 @@ class Player:
         if group == 'player:enemy' and self.invincible_time <= 0:
             self.hp -= 5
             self.invincible_time = self.invincible_duration
+        elif group == 'enemy_bullet:player' and self.invincible_time <= 0:
+            # 적 총알에 맞았을 때
+            damage = other.damage if hasattr(other, 'damage') else 5
+            self.hp -= damage
+            self.invincible_time = self.invincible_duration
 
     def reset_input_state(self):
         """입력 상태 초기화 - 업그레이드 화면 후 호출"""
