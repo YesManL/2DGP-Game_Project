@@ -1,141 +1,121 @@
 from pico2d import *
 import game_framework
-import random
+import game_world
 
-# 업그레이드 옵션들 (영문으로 변경)
-UPGRADES = {
-    'damage': {
-        'name': 'Damage UP',
-        'description': 'Bullet damage +10',
-        'icon': '[DMG]'
-    },
-    'fire_rate': {
-        'name': 'Fire Rate UP',
-        'description': 'Fire speed +20%',
-        'icon': '[SPD]'
-    },
-    'speed': {
-        'name': 'Move Speed UP',
-        'description': 'Movement +15%',
-        'icon': '[MOV]'
-    },
-    'max_hp': {
-        'name': 'Max HP UP',
-        'description': 'Max HP +20',
-        'icon': '[HP+]'
-    },
-    'hp_heal': {
-        'name': 'Heal',
-        'description': 'Restore HP 50',
-        'icon': '[HEL]'
-    },
-    'bullet_speed': {
-        'name': 'Bullet Speed UP',
-        'description': 'Bullet speed +20%',
-        'icon': '[BUL]'
-    }
-}
-
-selected_upgrades = []
-selected_index = 0
+selected_upgrade = 0
+upgrades = []
 font = None
-small_font = None
 title_font = None
 
 def init():
-    global selected_upgrades, selected_index, font, small_font, title_font
-    font = load_font('C:/Windows/Fonts/arial.ttf', 28)
-    small_font = load_font('C:/Windows/Fonts/arial.ttf', 20)
-    title_font = load_font('C:/Windows/Fonts/arial.ttf', 50)
+    global selected_upgrade, upgrades, font, title_font
+    selected_upgrade = 0
 
-    # 3개의 랜덤 업그레이드 선택
-    upgrade_keys = list(UPGRADES.keys())
-    random.shuffle(upgrade_keys)
-    selected_upgrades = upgrade_keys[:3]
-    selected_index = 0
+    # 폰트 로드 (시스템 기본 폰트 사용)
+    try:
+        font = load_font('C:/Windows/Fonts/arial.ttf', 20)
+        title_font = load_font('C:/Windows/Fonts/arial.ttf', 40)
+    except:
+        font = None
+        title_font = None
+
+    # 업그레이드 옵션들
+    upgrades = [
+        {'name': 'Damage +10', 'desc': 'Increase bullet damage', 'stat': 'damage'},
+        {'name': 'Fire Rate +20%', 'desc': 'Shoot faster', 'stat': 'fire_rate'},
+        {'name': 'HP +20', 'desc': 'Increase max HP', 'stat': 'hp'},
+        {'name': 'Speed +15%', 'desc': 'Move faster', 'stat': 'speed'}
+    ]
 
 def finish():
     pass
 
+def update():
+    pass
+
+def draw():
+    # 기존 게임 화면을 그대로 두고 그 위에 오버레이
+    import play_mode
+
+    # 먼저 게임 화면 그리기 (일시정지된 상태)
+    clear_canvas()
+    game_world.render()
+
+    # 반투명 어두운 배경 오버레이 (사각형으로 표현)
+    draw_rectangle(0, 0, 800, 600)
+
+    # 타이틀 배경 (회색)
+    draw_rectangle(200, 450, 600, 550)
+
+    # 타이틀 텍스트
+    if title_font:
+        title_font.draw(280, 490, 'UPGRADE', (255, 255, 255))
+
+    # 업그레이드 옵션들
+    for i, upgrade in enumerate(upgrades):
+        y = 380 - i * 80
+
+        # 옵션 박스
+        if i == selected_upgrade:
+            # 선택된 옵션 (밝은 파란색 느낌으로 더 큰 박스)
+            draw_rectangle(180, y - 30, 620, y + 30)
+        else:
+            # 일반 옵션 (어두운 회색)
+            draw_rectangle(200, y - 25, 600, y + 25)
+
+        # 업그레이드 텍스트
+        if font:
+            font.draw(250, y + 5, upgrade['name'], (255, 255, 255))
+            if i == selected_upgrade:
+                font.draw(250, y - 15, upgrade['desc'], (200, 200, 200))
+
+    # 안내 메시지 배경
+    draw_rectangle(200, 50, 600, 100)
+    if font:
+        font.draw(220, 70, 'Press ENTER to select', (255, 255, 255))
+
+    update_canvas()
+
 def handle_events():
-    global selected_index
+    global selected_upgrade
     events = get_events()
+
     for event in events:
         if event.type == SDL_QUIT:
             game_framework.quit()
         elif event.type == SDL_KEYDOWN:
             if event.key == SDLK_ESCAPE:
-                # ESC로는 닫을 수 없음 (업그레이드 필수 선택)
-                pass
+                game_framework.quit()
             elif event.key == SDLK_UP or event.key == SDLK_w:
-                selected_index = (selected_index - 1) % 3
+                selected_upgrade = (selected_upgrade - 1) % len(upgrades)
             elif event.key == SDLK_DOWN or event.key == SDLK_s:
-                selected_index = (selected_index + 1) % 3
-            elif event.key == SDLK_SPACE or event.key == SDLK_RETURN:
-                apply_upgrade(selected_upgrades[selected_index])
-                game_framework.pop_mode()
+                selected_upgrade = (selected_upgrade + 1) % len(upgrades)
+            elif event.key == SDLK_RETURN or event.key == SDLK_SPACE:
+                apply_upgrade()
 
-def apply_upgrade(upgrade_key):
+def apply_upgrade():
+    """선택한 업그레이드 적용"""
     import play_mode
+
+    upgrade = upgrades[selected_upgrade]
     player = play_mode.player
 
-    if upgrade_key == 'damage':
+    if upgrade['stat'] == 'damage':
         player.bullet_damage += 10
-    elif upgrade_key == 'fire_rate':
-        player.fire_rate *= 0.8  # 발사 간격 감소 = 연사속도 증가
-    elif upgrade_key == 'speed':
-        player.max_speed *= 1.15  # 후륜 자동차 시스템의 최대 속도 증가
-        player.speed *= 1.15  # 기존 speed 변수도 같이 증가 (호환성)
-    elif upgrade_key == 'max_hp':
+    elif upgrade['stat'] == 'fire_rate':
+        player.fire_rate = max(0.05, player.fire_rate * 0.8)  # 20% 빠르게
+    elif upgrade['stat'] == 'hp':
         player.max_hp += 20
         player.hp = min(player.hp + 20, player.max_hp)
-    elif upgrade_key == 'hp_heal':
-        player.hp = min(player.hp + 50, player.max_hp)
-    elif upgrade_key == 'bullet_speed':
-        player.bullet_speed *= 1.2
+    elif upgrade['stat'] == 'speed':
+        player.max_speed *= 1.15
 
-    # 업그레이드 적용 후 입력 상태 초기화
+    # 플레이어 입력 상태 초기화
     player.reset_input_state()
 
-def draw():
-    # 게임 화면을 배경으로 그리기 (멈춘 상태)
-    import play_mode
-    clear_canvas()
-    play_mode.draw()
-
-    # 반투명 어두운 오버레이 (사각형 여러 개로 표현)
-    for i in range(10):
-        draw_rectangle(0, 0, get_canvas_width(), get_canvas_height())
-
-    # 제목
-    title_font.draw(get_canvas_width() // 2 - 150, get_canvas_height() - 100, 'LEVEL UP!', (255, 255, 0))
-
-    # 업그레이드 옵션들
-    y_start = get_canvas_height() // 2 + 100
-    for i, upgrade_key in enumerate(selected_upgrades):
-        upgrade = UPGRADES[upgrade_key]
-        y = y_start - i * 130
-
-        # 선택된 항목 강조 (밝은 테두리)
-        if i == selected_index:
-            # 밝은 노란색 박스
-            for j in range(3):
-                draw_rectangle(120 - j, y - 60 - j, get_canvas_width() - 120 + j, y + 50 + j)
-        else:
-            # 어두운 회색 박스
-            draw_rectangle(120, y - 60, get_canvas_width() - 120, y + 50)
-
-        # 업그레이드 정보
-        font.draw(150, y + 15, f'{upgrade["icon"]} {upgrade["name"]}', (255, 255, 255))
-        small_font.draw(150, y - 15, upgrade["description"], (200, 200, 200))
-
-    # 조작 안내
-    small_font.draw(get_canvas_width() // 2 - 180, 60, 'W/S: Select  SPACE: Choose', (255, 255, 255))
-
-    update_canvas()
-
-def update():
-    pass
+    # 업그레이드 완료 후 게임으로 복귀
+    play_mode.game_paused = False
+    game_framework.pop_mode()
 
 def pause():
     pass
