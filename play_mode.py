@@ -11,7 +11,7 @@ from ui import UI
 player = None
 ui = None
 spawn_timer = 0
-spawn_interval = 2.0  # 적 스폰 간격
+spawn_interval = 3.0  # 적 스폰 간격 (2.0 -> 3.0으로 증가)
 wave = 1
 enemies_killed = 0
 enemies_per_wave = 10  # 웨이브당 처치해야 할 적 수
@@ -80,15 +80,24 @@ def update():
         spawn_enemy()
 
     # 충돌 페어 설정
-    bullets = [obj for obj in game_world.world[2]]
+    from bullet import EnemyBullet
+
+    bullets = [obj for obj in game_world.world[2] if not isinstance(obj, EnemyBullet)]
+    enemy_bullets = [obj for obj in game_world.world[2] if isinstance(obj, EnemyBullet)]
     enemies = [obj for obj in game_world.world[1] if isinstance(obj, Enemy)]
 
+    # 플레이어 총알 vs 적
     for bullet in bullets:
         for enemy in enemies:
             game_world.add_collision_pair('bullet:enemy', bullet, enemy)
 
+    # 플레이어 vs 적
     for enemy in enemies:
         game_world.add_collision_pair('player:enemy', player, enemy)
+
+    # 적 총알 vs 플레이어
+    for enemy_bullet in enemy_bullets:
+        game_world.add_collision_pair('enemy_bullet:player', enemy_bullet, player)
 
     game_world.handle_collisions()
 
@@ -138,10 +147,8 @@ def spawn_enemy():
     enemy.max_hp = enemy.hp
     enemy.speed = 50 + (wave - 1) * 20  # 기본 50, 웨이브당 +20 (매우 빠르게)
 
-    # 웨이브가 높으면 적 크기도 더 크게 증가
-    if wave >= 3:
-        enemy.width = 30 + (wave - 2) * 8
-        enemy.height = 30 + (wave - 2) * 8
+    # 적 크기는 기본 크기(80) 유지 - 크기 변경 로직 제거
+    # (크기를 키우는 대신 적의 수를 늘리는 방식으로 난이도 증가)
 
     game_world.add_object(enemy, 1)
 
