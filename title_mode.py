@@ -29,14 +29,20 @@ def handle_events():
 def draw():
     clear_canvas()
     if image:
-        # 로고 크기를 화면의 60% 크기로 조정
-        logo_width = get_canvas_width() * 0.6
-        logo_height = get_canvas_height() * 0.6
-        image.draw(get_canvas_width() // 2, get_canvas_height() // 2, logo_width, logo_height)
+        # 로고의 원본 비율을 유지하면서 적절한 크기로 표시
+        # 이미지 원본 비율 유지 (세로를 기준으로 크기 결정)
+        logo_height = get_canvas_height() * 0.4  # 화면 높이의 40%
+        # 원본 이미지의 가로세로 비율을 유지
+        aspect_ratio = image.w / image.h
+        logo_width = logo_height * aspect_ratio
+
+        # 로고를 화면 중앙 상단에 배치
+        image.draw(get_canvas_width() // 2, get_canvas_height() // 2 + 50, logo_width, logo_height)
     else:
         font.draw(get_canvas_width() // 2 - 150, get_canvas_height() // 2, 'SAND RAIDER', (255, 255, 255))
 
-    font.draw(get_canvas_width() // 2 - 200, get_canvas_height() // 2 - 100, 'Press SPACE to Start', (255, 255, 0))
+    # 텍스트를 화면 하단으로 이동
+    font.draw(get_canvas_width() // 2 - 200, 100, 'Press SPACE to Start', (255, 255, 0))
     update_canvas()
 
 def update():
