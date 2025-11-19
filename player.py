@@ -39,8 +39,8 @@ class Player:
 
         self.image_width = 100  # 80에서 100으로 증가
         self.image_height = 100  # 80에서 100으로 증가
-        self.turret_width = 40  # 32에서 40으로 증가 (비율 유지)
-        self.turret_height = 60  # 48에서 60으로 증가 (비율 유지)
+        self.turret_width = 40  # 터렛 너비를 원래대로
+        self.turret_height = 60  # 터렛 높이를 원래대로
         self.tire_width = 20  # 타이어 크기
         self.tire_height = 20
 
@@ -126,10 +126,9 @@ class Player:
             self.fire()
 
     def draw(self):
-        # 무적 시간일 때 깜빡임 효과 - 완전히 사라지지 않고 투명하게
+        # 무적 시간일 때 깜빡임 효과
         if self.invincible_time > 0 and int(self.invincible_time * 10) % 2 == 0:
-            # 깜빡임 시에도 반투명으로 표시
-            pass
+            return  # 깜빡임 시 그리지 않음
 
         if self.chassis_image:
             # 바퀴 위치 계산 (차체 기준)
@@ -160,14 +159,12 @@ class Player:
 
             # 뒷바퀴 먼저 그리기 (차체 아래)
             if self.rear_tire_image:
-                # 왼쪽 뒷바퀴 - 좌우반전
-                self.rear_tire_image.composite_draw(0, 'h', rear_left_x, rear_left_y, self.tire_width, self.tire_height)
-                # 회전 적용을 위해 rotate + flip
+                # 왼쪽 뒷바퀴 - 좌우반전 + 회전
                 self.rear_tire_image.clip_composite_draw(0, 0, self.rear_tire_image.w, self.rear_tire_image.h,
                                                          math.radians(self.chassis_angle), 'h',
                                                          rear_left_x, rear_left_y,
                                                          self.tire_width, self.tire_height)
-                # 오른쪽 뒷바퀴 - 일반
+                # 오른쪽 뒷바퀴 - 일반 회전
                 self.rear_tire_image.rotate_draw(math.radians(self.chassis_angle), rear_right_x, rear_right_y, self.tire_width, self.tire_height)
 
             # 차체 그리기
@@ -184,9 +181,33 @@ class Player:
                 # 오른쪽 앞바퀴 - 일반
                 self.front_tire_image.rotate_draw(math.radians(front_wheel_angle), front_right_x, front_right_y, self.tire_width, self.tire_height)
 
-            # 터렛 그리기 - y 좌표를 3픽셀 아래로 조정
+            # 터렛 그리기 - 차체 회전에 따라 터렛 베이스 위치도 회전
             if self.turret_image:
-                self.turret_image.rotate_draw(math.radians(self.turret_angle), self.x, self.y - 3, self.turret_width, self.turret_height)
+                # 터렛의 pivot을 약간 아래로 조정
+                turret_pivot_offset_y = 10  # 회전 중심 조정
+
+                # 터렛 베이스의 차체 중심으로부터의 오프셋 (차체 각도에 따라 회전)
+                turret_base_offset = -5  # 차체 중심에서 얼마나 떨어져 있는지
+
+                # 차체 각도를 고려한 터렛 베이스 위치 계산
+                chassis_rad = math.radians(self.chassis_angle + 90)
+                base_offset_x = math.cos(chassis_rad) * turret_base_offset
+                base_offset_y = math.sin(chassis_rad) * turret_base_offset
+
+                turret_base_x = self.x + base_offset_x
+                turret_base_y = self.y + base_offset_y
+
+                # 회전된 각도에 따라 터렛 위치 조정
+                turret_rad = math.radians(self.turret_angle + 90)
+
+                # 터렛의 실제 그리기 위치 계산 (pivot이 약간 아래쪽에 있도록)
+                offset_x = math.cos(turret_rad) * turret_pivot_offset_y
+                offset_y = math.sin(turret_rad) * turret_pivot_offset_y
+
+                turret_draw_x = turret_base_x + offset_x
+                turret_draw_y = turret_base_y + offset_y
+
+                self.turret_image.rotate_draw(math.radians(self.turret_angle), turret_draw_x, turret_draw_y, self.turret_width, self.turret_height)
         else:
             # 이미지가 없으면 사각형으로 표시
             draw_rectangle(self.x - 25, self.y - 25, self.x + 25, self.y + 25)
@@ -232,11 +253,30 @@ class Player:
         if self.fire_cooldown <= 0:
             from bullet import Bullet
 
-            # 포신 끝에서 총알 발사 (터렛 길이의 약 80% 위치)
-            turret_length = 30  # 포신 길이
-            rad = math.radians(self.turret_angle + 90)
-            bullet_x = self.x + math.cos(rad) * turret_length
-            bullet_y = self.y + math.sin(rad) * turret_length
+            # 터렛의 실제 베이스 위치 계산 (차체 회전 고려)
+            turret_base_offset = -5
+            chassis_rad = math.radians(self.chassis_angle + 90)
+            base_offset_x = math.cos(chassis_rad) * turret_base_offset
+            base_offset_y = math.sin(chassis_rad) * turret_base_offset
+
+            turret_base_x = self.x + base_offset_x
+            turret_base_y = self.y + base_offset_y
+
+            # 터렛 pivot 고려
+            turret_pivot_offset_y = 10
+            turret_rad = math.radians(self.turret_angle + 90)
+            pivot_offset_x = math.cos(turret_rad) * turret_pivot_offset_y
+            pivot_offset_y = math.sin(turret_rad) * turret_pivot_offset_y
+
+            turret_center_x = turret_base_x + pivot_offset_x
+            turret_center_y = turret_base_y + pivot_offset_y
+
+            # 터렛 중심에서 포신 끝까지의 거리 (터렛 높이의 절반 정도)
+            turret_muzzle_length = 35  # 30에서 35로 증가하여 총구 끝에 정확히 배치
+
+            # 총구 끝 위치 계산
+            bullet_x = turret_center_x + math.cos(turret_rad) * turret_muzzle_length
+            bullet_y = turret_center_y + math.sin(turret_rad) * turret_muzzle_length
 
             bullet = Bullet(bullet_x, bullet_y, self.turret_angle, self.bullet_speed, self.bullet_damage)
             game_world.add_object(bullet, 2)
