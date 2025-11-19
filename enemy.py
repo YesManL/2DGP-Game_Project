@@ -66,7 +66,8 @@ class Enemy:
         dy = self.target.y - self.y
 
         # 총구 위치 계산 (적 이미지의 앞쪽 끝)
-        gun_length = 35  # 총구까지의 거리
+        # 적의 크기가 80x80이고, 이미지 중심에서 총구까지의 거리 계산
+        gun_length = 45  # 35에서 45로 증가하여 총구 끝에서 정확히 발사
         gun_x = self.x + math.cos(self.angle) * gun_length
         gun_y = self.y + math.sin(self.angle) * gun_length
 
