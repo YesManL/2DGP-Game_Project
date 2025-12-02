@@ -142,20 +142,28 @@ def purchase_item():
     """아이템/무기 구매"""
     global selected_index, selected_tab
 
-    if selected_tab == 0:  # 무기 구매
+    if selected_tab == 0:  # 무기 구매 - 한 개만 구매 가능 (교체)
         weapon = weapons[selected_index]
         if GameData.player_gold >= weapon['price']:
             GameData.player_gold -= weapon['price']
             GameData.selected_weapon = selected_index
-    else:  # 아이템 구매
+    else:  # 아이템 구매 - 무제한 구매 가능
         item = items[selected_index]
-        # 영구 구매 목록에 없고 골드가 충분하면 구매 가능
-        if GameData.player_gold >= item['price'] and selected_index not in GameData.purchased_items:
+        # 골드가 충분하면 무제한 구매 가능
+        if GameData.player_gold >= item['price']:
             GameData.player_gold -= item['price']
-            GameData.purchased_items.append(selected_index)
-            # 적용 대기 목록에도 추가 (웨이브 완료 시 적용용)
-            if selected_index not in GameData.selected_items:
-                GameData.selected_items.append(selected_index)
+
+            # 구매 횟수 증가
+            if selected_index not in GameData.item_counts:
+                GameData.item_counts[selected_index] = 0
+            GameData.item_counts[selected_index] += 1
+
+            # 첫 구매 시 purchased_items에 추가
+            if selected_index not in GameData.purchased_items:
+                GameData.purchased_items.append(selected_index)
+
+            # 적용 대기 목록에 추가 (웨이브 완료 시 적용용)
+            GameData.selected_items.append(selected_index)
 
 def draw():
     clear_canvas()
