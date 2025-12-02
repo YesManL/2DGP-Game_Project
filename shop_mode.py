@@ -99,10 +99,17 @@ def handle_events():
                 purchase_item()
 
 def apply_items_and_return():
-    """구매한 아이템을 플레이어에게 적용하고 플레이로 복귀"""
+    """구매한 아이템을 플레이어에게 적용하고 복귀"""
     import play_mode
 
-    # 골드 동기화 (상점에서 소비한 골드를 플레이 모드에 반영)
+    # 플레이어가 있는지 확인 (게임 중인지 확인)
+    if play_mode.player is None:
+        # 타이틀에서 상점에 온 경우 - 타이틀로 복귀
+        import title_mode
+        game_framework.change_mode(title_mode)
+        return
+
+    # 게임 중인 경우 - 골드 동기화 및 아이템 적용
     play_mode.player_gold = GameData.player_gold
 
     # 구매한 아이템 효과 적용
