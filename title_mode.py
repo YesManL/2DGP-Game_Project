@@ -59,13 +59,19 @@ def draw():
     global selected_button
     clear_canvas()
 
-    # 배경 이미지 또는 단색 배경
-    if bg_image:
-        bg_image.draw(get_canvas_width() // 2, get_canvas_height() // 2, get_canvas_width(), get_canvas_height())
-    else:
-        # 배경 이미지가 없으면 심플한 어두운 배경
-        # 어두운 회색 배경
-        draw_rectangle(0, 0, get_canvas_width(), get_canvas_height())
+    # 심플한 어두운 사막 테마 배경 (Sand Raider 테마에 맞게)
+    # 어두운 갈색~주황색 그라데이션 느낌
+    canvas_width = get_canvas_width()
+    canvas_height = get_canvas_height()
+
+    # 단색 배경 그리기 (어두운 사막색)
+    # pico2d의 draw_rectangle은 색상을 설정할 수 없으므로 clear_canvas의 기본 검정 사용
+    # 대신 조금 밝은 테두리로 깊이감 추가
+
+    # 상단 장식 라인
+    for i in range(5):
+        alpha = 50 - i * 10
+        # 상단 라인은 생략하고 깔끔하게
 
     # 로고
     if image:
