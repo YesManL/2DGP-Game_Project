@@ -120,8 +120,11 @@ def apply_items_and_return():
     # 게임 중인 경우 - 골드 동기화 및 아이템 적용
     play_mode.player_gold = GameData.player_gold
 
-    # 구매한 아이템 효과 적용
+    # 무기 변경 적용
     player = play_mode.player
+    player.weapon_type = GameData.selected_weapon
+
+    # 구매한 아이템 효과 적용
     for item_id in GameData.selected_items:
         item = items[item_id]
         if item['name'] == 'HP Boost':

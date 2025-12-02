@@ -10,4 +10,3 @@ game_framework.run(title_mode)
 
 # 게임 종료 시 윈도우 닫기
 close_canvas()
-
