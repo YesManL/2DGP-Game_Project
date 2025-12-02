@@ -300,7 +300,7 @@ class Player:
                                        damage=self.bullet_damage * 1.2,  # 높은 데미지
                                        explosion_radius=100)  # 넓은 폭발 반경
                 game_world.add_object(bullet, 2)
-                game_world.add_collision_pair('bullet:enemy', bullet, None)
+                # 지연식 폭발이므로 충돌 감지 불필요
                 self.fire_cooldown = self.fire_rate * 2.0  # 매우 느린 연사
 
     def get_bb(self):

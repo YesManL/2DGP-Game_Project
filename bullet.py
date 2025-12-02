@@ -117,16 +117,21 @@ class EnemyBullet:
 
 # 폭발탄 클래스 (Explosive Bullet)
 class ExplosiveBullet:
-    """폭발 효과가 있는 특수 총알"""
+    """폭발 효과가 있는 특수 총알 - 지연식 폭발"""
     images = None
 
     def __init__(self, x, y, angle, speed=250, damage=15, explosion_radius=80):
         self.x, self.y = x, y
+        self.start_x, self.start_y = x, y  # 시작 위치 저장
         self.angle = angle
         self.speed = speed
         self.damage = damage
         self.explosion_radius = explosion_radius  # 폭발 반경
         self.width, self.height = 50, 50  # 폭발탄은 크게
+
+        # 지연 폭발 설정
+        self.explode_distance = 200  # 200px 비행 후 폭발 (짧은 거리)
+        self.has_exploded = False
 
         # 폭발탄용 이미지 (기본 총알보다 크게)
         if ExplosiveBullet.images is None:
@@ -157,8 +162,26 @@ class ExplosiveBullet:
             self.frame = (self.frame + 1) % self.frame_count
             self.frame_time = 0
 
+        # 비행 거리 계산
+        dx = self.x - self.start_x
+        dy = self.y - self.start_y
+        distance = (dx ** 2 + dy ** 2) ** 0.5
+
+        # 일정 거리 비행 후 폭발
+        if distance >= self.explode_distance and not self.has_exploded:
+            self.explode()
+
         # 화면 밖으로 나가면 삭제
         if self.x < 0 or self.x > get_canvas_width() or self.y < 0 or self.y > get_canvas_height():
+            game_world.remove_object(self)
+
+    def explode(self):
+        """폭발 생성"""
+        if not self.has_exploded:
+            from explosion import Explosion
+            explosion = Explosion(self.x, self.y, self.damage, self.explosion_radius)
+            game_world.add_object(explosion, 2)
+            self.has_exploded = True
             game_world.remove_object(self)
 
     def draw(self):
@@ -169,9 +192,5 @@ class ExplosiveBullet:
         return self.x - 25, self.y - 25, self.x + 25, self.y + 25
 
     def handle_collision(self, group, other):
-        if group == 'bullet:enemy':
-            # 적과 충돌 시 폭발 생성
-            from explosion import Explosion
-            explosion = Explosion(self.x, self.y, self.damage, self.explosion_radius)
-            game_world.add_object(explosion, 2)
-            game_world.remove_object(self)
+        # 적과 충돌해도 즉시 폭발하지 않음 (지연식이므로 무시)
+        pass
