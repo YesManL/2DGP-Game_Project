@@ -163,6 +163,7 @@ def draw():
 
 def finish():
     game_world.clear()
+    show_cursor()  # 게임 종료 시 커서 다시 보이기
 
 def pause():
     global game_paused

@@ -1,15 +1,23 @@
 from pico2d import *
 import game_framework
 import game_world
+import math
 
 selected_upgrade = 0
 upgrades = []
 font = None
 title_font = None
+bg_overlay = None
+button_base = None
+button_selected = None
+display_panel = None
+icon_images = {}
+animation_time = 0
 
 def init():
-    global selected_upgrade, upgrades, font, title_font
+    global selected_upgrade, upgrades, font, title_font, bg_overlay, button_base, button_selected, display_panel, icon_images, animation_time
     selected_upgrade = 0
+    animation_time = 0
 
     # 폰트 로드 (시스템 기본 폰트 사용)
     try:
@@ -18,6 +26,20 @@ def init():
     except:
         font = None
         title_font = None
+
+    # GUI 이미지 로드
+    try:
+        button_base = load_image('./04.GUI/PNG/GUI_Main_Button_1_Base.png')
+        button_selected = load_image('./04.GUI/PNG/GUI_Main_Button_1.png')
+        display_panel = load_image('./04.GUI/PNG/Display_12.png')
+
+        # 아이콘 이미지들
+        icon_images['damage'] = load_image('./03.아이템&아이콘/PNG/Item_3.png')
+        icon_images['fire_rate'] = load_image('./03.아이템&아이콘/PNG/Item_4.png')
+        icon_images['hp'] = load_image('./03.아이템&아이콘/PNG/Item_5.png')
+        icon_images['speed'] = load_image('./03.아이템&아이콘/PNG/Item_6.png')
+    except:
+        pass
 
     # 업그레이드 옵션들
     upgrades = [
@@ -31,7 +53,8 @@ def finish():
     pass
 
 def update():
-    pass
+    global animation_time
+    animation_time += game_framework.frame_time
 
 def draw():
     # 기존 게임 화면을 그대로 두고 그 위에 오버레이
@@ -41,38 +64,61 @@ def draw():
     clear_canvas()
     game_world.render()
 
-    # 반투명 어두운 배경 오버레이 (사각형으로 표현)
-    draw_rectangle(0, 0, 800, 600)
+    # 반투명 어두운 배경 오버레이
+    canvas_width = get_canvas_width()
+    canvas_height = get_canvas_height()
 
-    # 타이틀 배경 (회색)
-    draw_rectangle(200, 450, 600, 550)
+    # 어두운 오버레이 (직사각형)
+    draw_rectangle(0, 0, canvas_width, canvas_height)
+
+    # 타이틀 패널 - 맥박 효과
+    title_scale = 1.0 + math.sin(animation_time * 3) * 0.02
+    if display_panel:
+        display_panel.draw(canvas_width // 2, canvas_height - 80, int(400 * title_scale), int(80 * title_scale))
 
     # 타이틀 텍스트
     if title_font:
-        title_font.draw(280, 490, 'UPGRADE', (255, 255, 255))
+        title_font.draw(canvas_width // 2 - 100, canvas_height - 90, 'UPGRADE', (255, 255, 0))
 
     # 업그레이드 옵션들
     for i, upgrade in enumerate(upgrades):
-        y = 380 - i * 80
+        y = canvas_height - 200 - i * 90
 
-        # 옵션 박스
+        # 옵션 버튼
         if i == selected_upgrade:
-            # 선택된 옵션 (밝은 파란색 느낌으로 더 큰 박스)
-            draw_rectangle(180, y - 30, 620, y + 30)
+            # 선택된 옵션 - 맥박 효과
+            button_scale = 1.0 + math.sin(animation_time * 5) * 0.05
+            if button_selected:
+                button_selected.draw(canvas_width // 2, y, int(500 * button_scale), int(70 * button_scale))
+
+            # 아이콘도 회전 효과
+            if upgrade['stat'] in icon_images:
+                icon_rotation = math.sin(animation_time * 3) * 10
+                icon_images[upgrade['stat']].rotate_draw(icon_rotation * 3.14159 / 180, canvas_width // 2 - 200, y, 40, 40)
         else:
-            # 일반 옵션 (어두운 회색)
-            draw_rectangle(200, y - 25, 600, y + 25)
+            # 일반 옵션
+            if button_base:
+                button_base.draw(canvas_width // 2, y, 500, 70)
+
+            # 일반 아이콘
+            if upgrade['stat'] in icon_images:
+                icon_images[upgrade['stat']].draw(canvas_width // 2 - 200, y, 40, 40)
 
         # 업그레이드 텍스트
         if font:
-            font.draw(250, y + 5, upgrade['name'], (255, 255, 255))
-            if i == selected_upgrade:
-                font.draw(250, y - 15, upgrade['desc'], (200, 200, 200))
+            font.draw(canvas_width // 2 - 160, y + 5, upgrade['name'], (255, 255, 255))
+            font_size = 16
+            desc_font = load_font('C:/Windows/Fonts/arial.ttf', font_size)
+            desc_font.draw(canvas_width // 2 - 160, y - 15, upgrade['desc'], (200, 200, 200))
 
-    # 안내 메시지 배경
-    draw_rectangle(200, 50, 600, 100)
+    # 안내 메시지 - 깜빡임 효과
+    alpha = int((math.sin(animation_time * 4) + 1) * 127.5)
+    text_color = (255, 255, min(255, alpha + 100))
+
+    if display_panel:
+        display_panel.draw(canvas_width // 2, 80, 400, 60)
     if font:
-        font.draw(220, 70, 'Press ENTER to select', (255, 255, 255))
+        font.draw(canvas_width // 2 - 150, 75, 'Press ENTER to select', text_color)
 
     update_canvas()
 
@@ -109,6 +155,9 @@ def apply_upgrade():
         player.hp = min(player.hp + 20, player.max_hp)
     elif upgrade['stat'] == 'speed':
         player.max_speed *= 1.15
+
+    # 레벨 업!
+    player.level += 1
 
     # 플레이어 입력 상태 초기화
     player.reset_input_state()
