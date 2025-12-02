@@ -59,9 +59,13 @@ def draw():
     global selected_button
     clear_canvas()
 
-    # 배경 이미지
+    # 배경 이미지 또는 단색 배경
     if bg_image:
         bg_image.draw(get_canvas_width() // 2, get_canvas_height() // 2, get_canvas_width(), get_canvas_height())
+    else:
+        # 배경 이미지가 없으면 심플한 어두운 배경
+        # 어두운 회색 배경
+        draw_rectangle(0, 0, get_canvas_width(), get_canvas_height())
 
     # 로고
     if image:
