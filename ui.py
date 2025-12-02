@@ -1,4 +1,5 @@
 from pico2d import *
+from minimap import Minimap
 
 class UI:
     def __init__(self, player):
@@ -32,6 +33,18 @@ class UI:
             self.diamond_icon = load_image('./04.GUI/PNG/GUI_Diamond_1.png')
         except:
             pass
+
+        # 미니맵 생성 (우측 하단)
+        canvas_width = get_canvas_width()
+        canvas_height = get_canvas_height()
+        minimap_size = 150
+        minimap_margin = 20
+        self.minimap = Minimap(
+            canvas_width - minimap_size // 2 - minimap_margin,
+            minimap_size // 2 + minimap_margin,
+            minimap_size,
+            minimap_size
+        )
 
     def update(self):
         pass
@@ -103,3 +116,9 @@ class UI:
             if self.display_panel:
                 self.display_panel.draw(info_x, info_y - 80, 250, 35)
             self.font.draw(info_x - 80, info_y - 85, f'Next: {self.enemies_needed}', (255, 255, 0))
+
+        # 미니맵 그리기 (게임 월드에서 적 목록을 가져와야 함)
+        from enemy import Enemy
+        import game_world
+        enemies = [obj for obj in game_world.world[1] if isinstance(obj, Enemy)]
+        self.minimap.draw(self.player, enemies)
