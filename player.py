@@ -271,14 +271,34 @@ class Player:
             turret_center_x = turret_base_x + pivot_offset_x
             turret_center_y = turret_base_y + pivot_offset_y
 
-            # 터렛 중심에서 포신 끝까지의 거리 (터렛 높이의 절반 정도)
-            turret_muzzle_length = 35  # 30에서 35로 증가하여 총구 끝에 정확히 배치
+            # 터렛 중심에서 포신 끝까지의 거리
+            turret_muzzle_length = 35
 
             # 총구 끝 위치 계산
             bullet_x = turret_center_x + math.cos(turret_rad) * turret_muzzle_length
             bullet_y = turret_center_y + math.sin(turret_rad) * turret_muzzle_length
 
-            bullet = Bullet(bullet_x, bullet_y, self.turret_angle, self.bullet_speed, self.bullet_damage)
+            # 무기 타입에 따라 다른 발사 방식
+            if self.weapon_type == 0:  # Basic Gun - 단발
+                bullet = Bullet(bullet_x, bullet_y, self.turret_angle, self.bullet_speed, self.bullet_damage)
+                game_world.add_object(bullet, 2)
+                self.fire_cooldown = self.fire_rate
+
+            elif self.weapon_type == 1:  # Shotgun - 산탄 (5발)
+                spread_angles = [-15, -7.5, 0, 7.5, 15]  # 퍼지는 각도
+                for spread in spread_angles:
+                    bullet = Bullet(bullet_x, bullet_y, self.turret_angle + spread,
+                                  self.bullet_speed * 0.8,  # 약간 느림
+                                  self.bullet_damage * 0.6)  # 데미지 감소
+                    game_world.add_object(bullet, 2)
+                self.fire_cooldown = self.fire_rate * 1.5  # 발사 속도 느림
+
+            elif self.weapon_type == 2:  # Laser Gun - 관통 레이저 (빠른 연사)
+                bullet = Bullet(bullet_x, bullet_y, self.turret_angle,
+                              self.bullet_speed * 1.5,  # 매우 빠름
+                              self.bullet_damage * 0.8)  # 약간 약함
+                game_world.add_object(bullet, 2)
+                self.fire_cooldown = self.fire_rate * 0.3  # 매우 빠른 연사
             game_world.add_object(bullet, 2)
             self.fire_cooldown = self.fire_rate
 

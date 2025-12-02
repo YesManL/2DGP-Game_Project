@@ -64,8 +64,11 @@ def init():
     player = Player()
     game_world.add_object(player, 1)
 
-    # 타이틀 상점에서 구매한 아이템 적용 (구매 횟수만큼 효과 중첩)
+    # 선택한 무기 적용
     import shop_mode
+    player.weapon_type = shop_mode.GameData.selected_weapon
+
+    # 타이틀 상점에서 구매한 아이템 적용 (구매 횟수만큼 효과 중첩)
     for item_id in shop_mode.GameData.purchased_items:
         item = shop_mode.items[item_id]
         count = shop_mode.GameData.item_counts.get(item_id, 1)
