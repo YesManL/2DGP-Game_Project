@@ -49,7 +49,8 @@ def handle_events():
                 if selected_button == 0:
                     game_framework.change_mode(play_mode)
                 else:
-                    game_framework.change_mode(shop_mode)
+                    # 상점은 오버레이이므로 push_mode 사용
+                    game_framework.push_mode(shop_mode)
             elif event.key == SDLK_UP or event.key == SDLK_w:
                 selected_button = 0
             elif event.key == SDLK_DOWN or event.key == SDLK_s:
