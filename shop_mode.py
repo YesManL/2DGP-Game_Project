@@ -113,8 +113,8 @@ def apply_items_and_return():
     # 플레이어가 있는지 확인 (게임 중인지 확인)
     if play_mode.player is None:
         # 타이틀에서 상점에 온 경우 - 타이틀로 복귀
-        import title_mode
-        game_framework.change_mode(title_mode)
+        # change_mode 대신 pop_mode 사용 (스택에서 안전하게 제거)
+        game_framework.pop_mode()
         return
 
     # 게임 중인 경우 - 골드 동기화 및 아이템 적용
