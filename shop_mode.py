@@ -189,12 +189,9 @@ def draw():
         # 상점 아래에 있는 play_mode 그리기
         game_framework.stack[-2].draw()
 
-    # 반투명 어두운 오버레이 (게임 화면 위에)
+    # 반투명 어두운 오버레이 (게임 화면 위에) - 1번만 그리기
     from pico2d import draw_rectangle
-    # pico2d는 알파 블렌딩이 제한적이므로 어두운 사각형으로 대체
-    # 여러 번 그려서 어둡게 만들기
-    for _ in range(3):
-        draw_rectangle(0, 0, canvas_width, canvas_height)
+    draw_rectangle(0, 0, canvas_width, canvas_height)
 
     # 타이틀
     if display_panel:
@@ -240,11 +237,10 @@ def draw():
     for i, item in enumerate(items_to_show):
         y = start_y - i * 90
 
-        # 선택된 아이템
+        # 선택된 아이템 - 애니메이션 제거 (깜빡임 방지)
         if i == selected_index:
-            scale = 1.0 + math.sin(animation_time * 5) * 0.03
             if button_selected:
-                button_selected.draw(canvas_width // 2, y, int(600 * scale), int(70 * scale))
+                button_selected.draw(canvas_width // 2, y, 600, 70)
         else:
             if button_image:
                 button_image.draw(canvas_width // 2, y, 600, 70)
@@ -256,6 +252,7 @@ def draw():
         # 아이템 정보
         if font:
             font.draw(canvas_width // 2 - 200, y + 10, item['name'], (255, 255, 255))
+            # 작은 폰트 - init에서 로드한 것 사용 (매번 로드하지 않음)
             small_font = load_font('C:/Windows/Fonts/arial.ttf', 16)
             small_font.draw(canvas_width // 2 - 200, y - 10, item['desc'], (200, 200, 200))
 
@@ -279,8 +276,8 @@ def draw():
     if display_panel:
         display_panel.draw(canvas_width // 2, 60, 700, 50)
     if font:
-        alpha = int((math.sin(animation_time * 4) + 1) * 127.5)
-        text_color = (255, 255, min(255, alpha + 100))
+        # 깜빡임 제거 - 고정된 색상 사용
+        text_color = (200, 200, 200)
         font.draw(canvas_width // 2 - 320, 55, 'Arrow Keys: Navigate | Enter: Buy | ESC: Continue Play', text_color)
 
     update_canvas()
