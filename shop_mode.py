@@ -79,9 +79,8 @@ def handle_events():
             game_framework.quit()
         elif event.type == SDL_KEYDOWN:
             if event.key == SDLK_ESCAPE:
-                # 타이틀로 돌아가기
-                import title_mode
-                game_framework.change_mode(title_mode)
+                # 상점 종료하고 플레이로 복귀 (골드와 아이템 적용)
+                apply_items_and_return()
             elif event.key == SDLK_LEFT:
                 selected_tab = 0  # 무기 탭
             elif event.key == SDLK_RIGHT:
@@ -98,6 +97,37 @@ def handle_events():
                     selected_index = (selected_index + 1) % len(items)
             elif event.key == SDLK_RETURN or event.key == SDLK_SPACE:
                 purchase_item()
+
+def apply_items_and_return():
+    """구매한 아이템을 플레이어에게 적용하고 플레이로 복귀"""
+    import play_mode
+
+    # 골드 동기화 (상점에서 소비한 골드를 플레이 모드에 반영)
+    play_mode.player_gold = GameData.player_gold
+
+    # 구매한 아이템 효과 적용
+    player = play_mode.player
+    for item_id in GameData.selected_items:
+        item = items[item_id]
+        if item['name'] == 'HP Boost':
+            player.max_hp += 50
+            player.hp = min(player.hp + 50, player.max_hp)
+        elif item['name'] == 'Speed Up':
+            player.max_speed *= 1.2
+        elif item['name'] == 'Damage Up':
+            player.bullet_damage = int(player.bullet_damage * 1.3)
+        elif item['name'] == 'Fire Rate':
+            player.fire_rate = max(0.05, player.fire_rate * 0.75)
+
+    # 구매한 아이템 리스트 초기화 (중복 적용 방지)
+    GameData.selected_items = []
+
+    # 플레이어 입력 상태 초기화
+    player.reset_input_state()
+
+    # 플레이 모드로 복귀
+    play_mode.game_paused = False
+    game_framework.pop_mode()
 
 def purchase_item():
     """아이템/무기 구매"""
@@ -202,7 +232,7 @@ def draw():
     if font:
         alpha = int((math.sin(animation_time * 4) + 1) * 127.5)
         text_color = (255, 255, min(255, alpha + 100))
-        font.draw(canvas_width // 2 - 300, 55, 'Arrow Keys: Navigate | Enter: Buy | ESC: Back', text_color)
+        font.draw(canvas_width // 2 - 320, 55, 'Arrow Keys: Navigate | Enter: Buy | ESC: Continue Play', text_color)
 
     update_canvas()
 

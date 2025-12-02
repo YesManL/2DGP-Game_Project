@@ -136,8 +136,9 @@ class Enemy:
             self.hp -= damage
             self.hit_flash = 0.1  # 0.1초간 피격 표시
             if self.hp <= 0 and not self.is_dead:
-                # 적이 죽으면 카운트 증가 (한 번만)
+                # 적이 죽으면 카운트 증가 및 골드 지급 (한 번만)
                 self.is_dead = True
                 import play_mode
                 play_mode.increase_kill_count()
+                play_mode.add_gold(10)  # 적 처치 시 10골드 지급
                 game_world.remove_object(self)

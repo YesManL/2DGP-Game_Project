@@ -117,6 +117,16 @@ class UI:
                 self.display_panel.draw(info_x, info_y - 80, 250, 35)
             self.font.draw(info_x - 80, info_y - 85, f'Next: {self.enemies_needed}', (255, 255, 0))
 
+        # 골드 표시 (좌측 하단)
+        import play_mode
+        gold_x = 100
+        gold_y = 50
+        if self.display_panel:
+            self.display_panel.draw(gold_x, gold_y, 180, 40)
+        if self.diamond_icon:
+            self.diamond_icon.draw(gold_x - 60, gold_y, 25, 25)
+        self.font.draw(gold_x - 40, gold_y - 5, f'Gold: {play_mode.player_gold}', (255, 215, 0))
+
         # 미니맵 그리기 (게임 월드에서 적 목록을 가져와야 함)
         from enemy import Enemy
         import game_world

@@ -17,20 +17,36 @@ enemies_killed = 0
 enemies_per_wave = 10  # 웨이브당 처치해야 할 적 수
 wave_complete = False
 game_paused = False  # 레벨업 시 일시정지
+cursor_image = None
+mouse_x, mouse_y = 400, 300
 
 def handle_events():
+    global mouse_x, mouse_y
     event_list = get_events()
     for event in event_list:
         if event.type == SDL_QUIT:
             game_framework.quit()
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
             game_framework.quit()
+        elif event.type == SDL_MOUSEMOTION:
+            mouse_x, mouse_y = event.x, get_canvas_height() - event.y
+            if player:
+                player.handle_event(event)
         else:
             if player:
                 player.handle_event(event)
 
 def init():
-    global player, ui, spawn_timer, wave, enemies_killed, enemies_per_wave, wave_complete, game_paused
+    global player, ui, spawn_timer, wave, enemies_killed, enemies_per_wave, wave_complete, game_paused, cursor_image, mouse_x, mouse_y, player_gold
+
+    # 커서 이미지 로드
+    try:
+        cursor_image = load_image('./04.GUI/PNG/Cursor_Targeting.png')
+    except:
+        cursor_image = None
+
+    # SDL 커서 숨기기
+    SDL_ShowCursor(SDL_DISABLE)
 
     # 배경 생성
     background = Background()
@@ -50,6 +66,8 @@ def init():
     enemies_per_wave = 10
     wave_complete = False
     game_paused = False
+    mouse_x, mouse_y = 400, 300
+    player_gold = 0  # 골드 초기화
 
 def update():
     global spawn_timer, spawn_interval, enemies_killed, wave, enemies_per_wave, wave_complete, game_paused
@@ -155,6 +173,11 @@ def spawn_enemy():
 def increase_kill_count():
     global enemies_killed
     enemies_killed += 1
+
+def add_gold(amount):
+    """골드 추가 함수"""
+    global player_gold
+    player_gold += amount
 
 def draw():
     clear_canvas()
