@@ -299,8 +299,6 @@ class Player:
                               self.bullet_damage * 0.8)  # 약간 약함
                 game_world.add_object(bullet, 2)
                 self.fire_cooldown = self.fire_rate * 0.3  # 매우 빠른 연사
-            game_world.add_object(bullet, 2)
-            self.fire_cooldown = self.fire_rate
 
     def get_bb(self):
         return self.x - 30, self.y - 30, self.x + 30, self.y + 30
