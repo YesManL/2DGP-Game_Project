@@ -183,8 +183,18 @@ def draw():
     canvas_width = get_canvas_width()
     canvas_height = get_canvas_height()
 
-    # 어두운 배경
-    draw_rectangle(0, 0, canvas_width, canvas_height)
+    # 배경에 게임 화면 그리기 (스택에서 이전 모드가 있으면)
+    import game_framework
+    if len(game_framework.stack) > 1:
+        # 상점 아래에 있는 play_mode 그리기
+        game_framework.stack[-2].draw()
+
+    # 반투명 어두운 오버레이 (게임 화면 위에)
+    from pico2d import draw_rectangle
+    # pico2d는 알파 블렌딩이 제한적이므로 어두운 사각형으로 대체
+    # 여러 번 그려서 어둡게 만들기
+    for _ in range(3):
+        draw_rectangle(0, 0, canvas_width, canvas_height)
 
     # 타이틀
     if display_panel:
