@@ -142,10 +142,16 @@ def purchase_item():
     """아이템/무기 구매"""
     global selected_index, selected_tab
 
-    if selected_tab == 0:  # 무기 구매 - 한 개만 구매 가능 (교체)
+    if selected_tab == 0:  # 무기 구매 - 한 번만 구매, 이후엔 무료 교체
         weapon = weapons[selected_index]
-        if GameData.player_gold >= weapon['price']:
+
+        # 이미 구매한 무기면 무료로 교체
+        if selected_index in GameData.purchased_weapons:
+            GameData.selected_weapon = selected_index
+        # 구매하지 않은 무기면 골드로 구매
+        elif GameData.player_gold >= weapon['price']:
             GameData.player_gold -= weapon['price']
+            GameData.purchased_weapons.append(selected_index)
             GameData.selected_weapon = selected_index
     else:  # 아이템 구매 - 무제한 구매 가능
         item = items[selected_index]
@@ -242,14 +248,16 @@ def draw():
             font.draw(canvas_width // 2 + 150, y - 5, f"{item['price']}G", price_color)
 
             # 구매 여부 표시
-            if selected_tab == 0 and i == GameData.selected_weapon:
-                font.draw(canvas_width // 2 + 220, y - 5, '[Equipped]', (100, 255, 100))
-            elif selected_tab == 1 and i in GameData.purchased_items:
-                # 구매 횟수 표시
-                count = GameData.item_counts.get(i, 0)
-                font.draw(canvas_width // 2 + 220, y - 5, f'x{count}', (100, 255, 100))
-            elif selected_tab == 1 and i in GameData.selected_items:
-                font.draw(canvas_width // 2 + 220, y - 5, '[Owned]', (100, 255, 100))
+            if selected_tab == 0:  # 무기 탭
+                if i == GameData.selected_weapon:
+                    font.draw(canvas_width // 2 + 220, y - 5, '[Equipped]', (100, 255, 100))
+                elif i in GameData.purchased_weapons:
+                    font.draw(canvas_width // 2 + 220, y - 5, '[Owned]', (150, 150, 255))
+            elif selected_tab == 1:  # 아이템 탭
+                if i in GameData.purchased_items:
+                    # 구매 횟수 표시
+                    count = GameData.item_counts.get(i, 0)
+                    font.draw(canvas_width // 2 + 220, y - 5, f'x{count}', (100, 255, 100))
 
     # 하단 안내 메시지
     if display_panel:
