@@ -26,7 +26,7 @@ class Enemy:
         # 총알 발사 관련
         self.fire_cooldown = 0
         self.fire_rate = 2.0  # 2초마다 발사
-        self.attack_range = 300  # 공격 사거리
+        self.attack_range = 150  # 공격 사거리 (300에서 150으로 감소 - 더 가까이 접근)
 
         # 플레이어를 향한 각도
         self.angle = 0
