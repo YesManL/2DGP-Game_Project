@@ -27,7 +27,12 @@ def handle_events():
         if event.type == SDL_QUIT:
             game_framework.quit()
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
-            game_framework.quit()
+            # 게임 종료 대신 타이틀 화면으로 이동
+            import title_mode
+            import shop_mode
+            # 현재 골드를 GameData에 저장
+            shop_mode.GameData.player_gold = player_gold
+            game_framework.change_mode(title_mode)
         elif event.type == SDL_MOUSEMOTION:
             mouse_x, mouse_y = event.x, get_canvas_height() - event.y
             if player:
