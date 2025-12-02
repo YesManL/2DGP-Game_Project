@@ -45,6 +45,7 @@ def handle_events():
                 game_framework.change_mode(play_mode)
 
 def draw():
+    global selected_button
     clear_canvas()
 
     # 배경 이미지
