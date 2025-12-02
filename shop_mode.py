@@ -178,33 +178,14 @@ def purchase_item():
             GameData.selected_items.append(selected_index)
 
 def draw():
+    clear_canvas()
+
     canvas_width = get_canvas_width()
     canvas_height = get_canvas_height()
 
-    # 배경 처리: 플레이 모드에서 온 경우만 게임 화면 표시
-    import game_framework
-    show_game_background = False
-
-    if len(game_framework.stack) > 1:
-        # 이전 모드가 play_mode인지 확인
-        previous_mode = game_framework.stack[-2]
-        import play_mode
-        # play_mode 모듈과 비교
-        if previous_mode == play_mode:
-            show_game_background = True
-
-    if show_game_background:
-        # 플레이 모드에서 온 경우: 게임 화면 배경으로 표시
-        clear_canvas()
-        game_framework.stack[-2].draw()
-        # 어두운 오버레이
-        from pico2d import draw_rectangle
-        draw_rectangle(0, 0, canvas_width, canvas_height)
-    else:
-        # 타이틀에서 온 경우: 검정 배경만
-        clear_canvas()
-        from pico2d import draw_rectangle
-        draw_rectangle(0, 0, canvas_width, canvas_height)
+    # 어두운 배경 (깜빡임 방지를 위해 게임 화면 그리기 제거)
+    from pico2d import draw_rectangle
+    draw_rectangle(0, 0, canvas_width, canvas_height)
 
     # 타이틀
     if display_panel:
