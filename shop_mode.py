@@ -147,9 +147,13 @@ def purchase_item():
             GameData.selected_weapon = selected_index
     else:  # 아이템 구매
         item = items[selected_index]
-        if GameData.player_gold >= item['price'] and selected_index not in GameData.selected_items:
+        # 영구 구매 목록에 없고 골드가 충분하면 구매 가능
+        if GameData.player_gold >= item['price'] and selected_index not in GameData.purchased_items:
             GameData.player_gold -= item['price']
-            GameData.selected_items.append(selected_index)
+            GameData.purchased_items.append(selected_index)
+            # 적용 대기 목록에도 추가 (웨이브 완료 시 적용용)
+            if selected_index not in GameData.selected_items:
+                GameData.selected_items.append(selected_index)
 
 def draw():
     clear_canvas()
@@ -230,6 +234,8 @@ def draw():
             # 구매 여부 표시
             if selected_tab == 0 and i == GameData.selected_weapon:
                 font.draw(canvas_width // 2 + 220, y - 5, '[Equipped]', (100, 255, 100))
+            elif selected_tab == 1 and i in GameData.purchased_items:
+                font.draw(canvas_width // 2 + 220, y - 5, '[Owned]', (100, 255, 100))
             elif selected_tab == 1 and i in GameData.selected_items:
                 font.draw(canvas_width // 2 + 220, y - 5, '[Owned]', (100, 255, 100))
 

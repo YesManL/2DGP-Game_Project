@@ -56,6 +56,20 @@ def init():
     player = Player()
     game_world.add_object(player, 1)
 
+    # 타이틀 상점에서 구매한 아이템 적용 (영구 구매 아이템)
+    import shop_mode
+    for item_id in shop_mode.GameData.purchased_items:
+        item = shop_mode.items[item_id]
+        if item['name'] == 'HP Boost':
+            player.max_hp += 50
+            player.hp = player.max_hp
+        elif item['name'] == 'Speed Up':
+            player.max_speed *= 1.2
+        elif item['name'] == 'Damage Up':
+            player.bullet_damage = int(player.bullet_damage * 1.3)
+        elif item['name'] == 'Fire Rate':
+            player.fire_rate = max(0.05, player.fire_rate * 0.75)
+
     # UI 생성
     ui = UI(player)
     game_world.add_object(ui, 3)
@@ -67,7 +81,8 @@ def init():
     wave_complete = False
     game_paused = False
     mouse_x, mouse_y = 400, 300
-    player_gold = 0  # 골드 초기화
+    # 타이틀 상점에서 사용한 후 남은 골드로 시작
+    player_gold = shop_mode.GameData.player_gold
 
 def update():
     global spawn_timer, spawn_interval, enemies_killed, wave, enemies_per_wave, wave_complete, game_paused
@@ -79,8 +94,11 @@ def update():
     # 플레이어가 죽었는지 체크
     if player.hp <= 0:
         import gameover_mode
+        import shop_mode
         # gameover_mode의 score를 직접 설정
         gameover_mode.score = enemies_killed
+        # 획득한 골드를 GameData에 저장 (다음 게임에도 유지)
+        shop_mode.GameData.player_gold = player_gold
         game_framework.change_mode(gameover_mode)
         return
 
