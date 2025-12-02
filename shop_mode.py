@@ -1,0 +1,218 @@
+from pico2d import *
+import game_framework
+import math
+
+# 플레이어가 선택할 수 있는 아이템/무기
+class GameData:
+    """게임 전역 데이터 - 플레이어가 선택한 무기와 아이템"""
+    selected_weapon = 0  # 0: 기본 총, 1: 샷건, 2: 레이저
+    selected_items = []  # 선택한 아이템 리스트
+    player_gold = 1000  # 플레이어 골드
+
+# 상점 아이템 데이터
+weapons = [
+    {'name': 'Basic Gun', 'desc': 'Standard weapon', 'price': 0, 'icon_id': 3},
+    {'name': 'Shotgun', 'desc': 'Spread shot', 'price': 500, 'icon_id': 4},
+    {'name': 'Laser Gun', 'desc': 'Continuous beam', 'price': 800, 'icon_id': 5}
+]
+
+items = [
+    {'name': 'HP Boost', 'desc': '+50 Max HP', 'price': 300, 'icon_id': 5},
+    {'name': 'Speed Up', 'desc': '+20% Speed', 'price': 250, 'icon_id': 6},
+    {'name': 'Damage Up', 'desc': '+30% Damage', 'price': 400, 'icon_id': 3},
+    {'name': 'Fire Rate', 'desc': '+25% Fire Rate', 'price': 350, 'icon_id': 4}
+]
+
+# 상점 UI 변수
+animation_time = 0
+font = None
+title_font = None
+button_image = None
+button_selected = None
+display_panel = None
+icon_images = {}
+gold_icon = None
+selected_tab = 0  # 0: 무기, 1: 아이템
+selected_index = 0
+
+def init():
+    global animation_time, font, title_font, button_image, button_selected, display_panel, icon_images, gold_icon
+    global selected_tab, selected_index
+
+    animation_time = 0
+    selected_tab = 0
+    selected_index = 0
+
+    # 폰트 로드
+    try:
+        font = load_font('C:/Windows/Fonts/arial.ttf', 20)
+        title_font = load_font('C:/Windows/Fonts/arial.ttf', 40)
+    except:
+        font = None
+        title_font = None
+
+    # GUI 이미지 로드
+    try:
+        button_image = load_image('./04.GUI/PNG/GUI_Main_Button_1_Base.png')
+        button_selected = load_image('./04.GUI/PNG/GUI_Main_Button_1.png')
+        display_panel = load_image('./04.GUI/PNG/Display_12.png')
+        gold_icon = load_image('./04.GUI/PNG/GUI_gold_1.png')
+
+        # 아이템 아이콘들 로드
+        for i in range(1, 11):
+            try:
+                icon_images[i] = load_image(f'./03.아이템&아이콘/PNG/Item_{i}.png')
+            except:
+                pass
+    except:
+        pass
+
+def finish():
+    pass
+
+def handle_events():
+    global selected_tab, selected_index
+    events = get_events()
+
+    for event in events:
+        if event.type == SDL_QUIT:
+            game_framework.quit()
+        elif event.type == SDL_KEYDOWN:
+            if event.key == SDLK_ESCAPE:
+                # 타이틀로 돌아가기
+                import title_mode
+                game_framework.change_mode(title_mode)
+            elif event.key == SDLK_LEFT:
+                selected_tab = 0  # 무기 탭
+            elif event.key == SDLK_RIGHT:
+                selected_tab = 1  # 아이템 탭
+            elif event.key == SDLK_UP or event.key == SDLK_w:
+                if selected_tab == 0:
+                    selected_index = (selected_index - 1) % len(weapons)
+                else:
+                    selected_index = (selected_index - 1) % len(items)
+            elif event.key == SDLK_DOWN or event.key == SDLK_s:
+                if selected_tab == 0:
+                    selected_index = (selected_index + 1) % len(weapons)
+                else:
+                    selected_index = (selected_index + 1) % len(items)
+            elif event.key == SDLK_RETURN or event.key == SDLK_SPACE:
+                purchase_item()
+
+def purchase_item():
+    """아이템/무기 구매"""
+    global selected_index, selected_tab
+
+    if selected_tab == 0:  # 무기 구매
+        weapon = weapons[selected_index]
+        if GameData.player_gold >= weapon['price']:
+            GameData.player_gold -= weapon['price']
+            GameData.selected_weapon = selected_index
+    else:  # 아이템 구매
+        item = items[selected_index]
+        if GameData.player_gold >= item['price'] and selected_index not in GameData.selected_items:
+            GameData.player_gold -= item['price']
+            GameData.selected_items.append(selected_index)
+
+def draw():
+    clear_canvas()
+
+    canvas_width = get_canvas_width()
+    canvas_height = get_canvas_height()
+
+    # 어두운 배경
+    draw_rectangle(0, 0, canvas_width, canvas_height)
+
+    # 타이틀
+    if display_panel:
+        display_panel.draw(canvas_width // 2, canvas_height - 60, 300, 80)
+    if title_font:
+        title_font.draw(canvas_width // 2 - 70, canvas_height - 70, 'SHOP', (255, 215, 0))
+
+    # 골드 표시
+    if display_panel:
+        display_panel.draw(canvas_width - 120, canvas_height - 60, 200, 50)
+    if gold_icon:
+        gold_icon.draw(canvas_width - 180, canvas_height - 60, 30, 30)
+    if font:
+        font.draw(canvas_width - 150, canvas_height - 70, f'{GameData.player_gold}G', (255, 215, 0))
+
+    # 탭 버튼 (무기 / 아이템)
+    tab_y = canvas_height - 140
+
+    # 무기 탭
+    if selected_tab == 0:
+        if button_selected:
+            button_selected.draw(canvas_width // 2 - 120, tab_y, 200, 50)
+    else:
+        if button_image:
+            button_image.draw(canvas_width // 2 - 120, tab_y, 200, 50)
+    if font:
+        font.draw(canvas_width // 2 - 170, tab_y - 10, 'Weapons', (255, 255, 255))
+
+    # 아이템 탭
+    if selected_tab == 1:
+        if button_selected:
+            button_selected.draw(canvas_width // 2 + 120, tab_y, 200, 50)
+    else:
+        if button_image:
+            button_image.draw(canvas_width // 2 + 120, tab_y, 200, 50)
+    if font:
+        font.draw(canvas_width // 2 + 80, tab_y - 10, 'Items', (255, 255, 255))
+
+    # 아이템 목록 표시
+    items_to_show = weapons if selected_tab == 0 else items
+    start_y = canvas_height - 230
+
+    for i, item in enumerate(items_to_show):
+        y = start_y - i * 90
+
+        # 선택된 아이템
+        if i == selected_index:
+            scale = 1.0 + math.sin(animation_time * 5) * 0.03
+            if button_selected:
+                button_selected.draw(canvas_width // 2, y, int(600 * scale), int(70 * scale))
+        else:
+            if button_image:
+                button_image.draw(canvas_width // 2, y, 600, 70)
+
+        # 아이콘
+        if item['icon_id'] in icon_images:
+            icon_images[item['icon_id']].draw(canvas_width // 2 - 250, y, 40, 40)
+
+        # 아이템 정보
+        if font:
+            font.draw(canvas_width // 2 - 200, y + 10, item['name'], (255, 255, 255))
+            small_font = load_font('C:/Windows/Fonts/arial.ttf', 16)
+            small_font.draw(canvas_width // 2 - 200, y - 10, item['desc'], (200, 200, 200))
+
+            # 가격 표시
+            price_color = (255, 215, 0) if GameData.player_gold >= item['price'] else (255, 100, 100)
+            font.draw(canvas_width // 2 + 150, y - 5, f"{item['price']}G", price_color)
+
+            # 구매 여부 표시
+            if selected_tab == 0 and i == GameData.selected_weapon:
+                font.draw(canvas_width // 2 + 220, y - 5, '[Equipped]', (100, 255, 100))
+            elif selected_tab == 1 and i in GameData.selected_items:
+                font.draw(canvas_width // 2 + 220, y - 5, '[Owned]', (100, 255, 100))
+
+    # 하단 안내 메시지
+    if display_panel:
+        display_panel.draw(canvas_width // 2, 60, 700, 50)
+    if font:
+        alpha = int((math.sin(animation_time * 4) + 1) * 127.5)
+        text_color = (255, 255, min(255, alpha + 100))
+        font.draw(canvas_width // 2 - 300, 55, 'Arrow Keys: Navigate | Enter: Buy | ESC: Back', text_color)
+
+    update_canvas()
+
+def update():
+    global animation_time
+    animation_time += game_framework.frame_time
+
+def pause():
+    pass
+
+def resume():
+    pass
+

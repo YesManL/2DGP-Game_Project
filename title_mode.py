@@ -53,25 +53,48 @@ def draw():
 
     # 로고
     if image:
-        logo_height = get_canvas_height() * 0.5  # 화면 높이의 50%로 증가
+        logo_height = get_canvas_height() * 0.4  # 40%로 줄임
         aspect_ratio = image.w / image.h
         logo_width = logo_height * aspect_ratio
 
         # 약간의 바운스 효과
         bounce = math.sin(animation_time * 2) * 5
-        image.draw(get_canvas_width() // 2, get_canvas_height() // 2 + 80 + bounce, logo_width, logo_height)
+        image.draw(get_canvas_width() // 2, get_canvas_height() // 2 + 120 + bounce, logo_width, logo_height)
     else:
         font.draw(get_canvas_width() // 2 - 150, get_canvas_height() // 2, 'SAND RAIDER', (255, 255, 255))
 
-    # 시작 버튼
+    # Play 버튼
+    play_y = 200
     if button_image:
-        button_scale = 1.0 + math.sin(animation_time * 3) * 0.05  # 맥박 효과
-        button_image.draw(get_canvas_width() // 2, 150, int(200 * button_scale), int(60 * button_scale))
+        if selected_button == 0:
+            button_scale = 1.0 + math.sin(animation_time * 5) * 0.08  # 선택된 버튼 맥박 효과
+            button_image.draw(get_canvas_width() // 2, play_y, int(250 * button_scale), int(70 * button_scale))
+        else:
+            button_image.draw(get_canvas_width() // 2, play_y, 250, 70)
 
-    # 텍스트 - 깜빡이는 효과
-    alpha = int((math.sin(animation_time * 4) + 1) * 127.5)  # 0~255 범위
+    # Play 텍스트
+    play_color = (255, 255, 100) if selected_button == 0 else (255, 255, 255)
+    font.draw(get_canvas_width() // 2 - 60, play_y - 15, 'PLAY', play_color)
+
+    # Shop 버튼
+    shop_y = 120
+    if button_image:
+        if selected_button == 1:
+            button_scale = 1.0 + math.sin(animation_time * 5) * 0.08  # 선택된 버튼 맥박 효과
+            button_image.draw(get_canvas_width() // 2, shop_y, int(250 * button_scale), int(70 * button_scale))
+        else:
+            button_image.draw(get_canvas_width() // 2, shop_y, 250, 70)
+
+    # Shop 텍스트
+    shop_color = (255, 255, 100) if selected_button == 1 else (255, 255, 255)
+    font.draw(get_canvas_width() // 2 - 60, shop_y - 15, 'SHOP', shop_color)
+
+    # 안내 텍스트
+    small_font = load_font('C:/Windows/Fonts/arial.ttf', 20)
+    alpha = int((math.sin(animation_time * 4) + 1) * 127.5)
     text_color = (255, 255, min(255, alpha + 100))
-    font.draw(get_canvas_width() // 2 - 200, 140, 'Press SPACE to Start', text_color)
+    small_font.draw(get_canvas_width() // 2 - 150, 50, 'Arrow Keys + Enter to Select', text_color)
+
     update_canvas()
 
 def update():
