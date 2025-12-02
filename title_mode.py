@@ -1,16 +1,19 @@
 from pico2d import *
 import game_framework
 import play_mode
+import shop_mode
 import math
 
 animation_time = 0
+selected_button = 0  # 0: Play, 1: Shop
 
 def init():
-    global image, font, bg_image, button_image, animation_time
+    global image, font, bg_image, button_image, animation_time, selected_button
     image = None
     bg_image = None
     button_image = None
     animation_time = 0
+    selected_button = 0
 
     try:
         image = load_image('./99.etc/Title2.png')
@@ -34,6 +37,7 @@ def finish():
     pass
 
 def handle_events():
+    global selected_button
     events = get_events()
     for event in events:
         if event.type == SDL_QUIT:
@@ -41,8 +45,15 @@ def handle_events():
         elif event.type == SDL_KEYDOWN:
             if event.key == SDLK_ESCAPE:
                 game_framework.quit()
-            elif event.key == SDLK_SPACE:
-                game_framework.change_mode(play_mode)
+            elif event.key == SDLK_SPACE or event.key == SDLK_RETURN:
+                if selected_button == 0:
+                    game_framework.change_mode(play_mode)
+                else:
+                    game_framework.change_mode(shop_mode)
+            elif event.key == SDLK_UP or event.key == SDLK_w:
+                selected_button = 0
+            elif event.key == SDLK_DOWN or event.key == SDLK_s:
+                selected_button = 1
 
 def draw():
     global selected_button
