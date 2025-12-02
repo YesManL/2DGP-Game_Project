@@ -236,7 +236,9 @@ def draw():
             if selected_tab == 0 and i == GameData.selected_weapon:
                 font.draw(canvas_width // 2 + 220, y - 5, '[Equipped]', (100, 255, 100))
             elif selected_tab == 1 and i in GameData.purchased_items:
-                font.draw(canvas_width // 2 + 220, y - 5, '[Owned]', (100, 255, 100))
+                # 구매 횟수 표시
+                count = GameData.item_counts.get(i, 0)
+                font.draw(canvas_width // 2 + 220, y - 5, f'x{count}', (100, 255, 100))
             elif selected_tab == 1 and i in GameData.selected_items:
                 font.draw(canvas_width // 2 + 220, y - 5, '[Owned]', (100, 255, 100))
 
