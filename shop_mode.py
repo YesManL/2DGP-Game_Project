@@ -12,6 +12,11 @@ class GameData:
     item_counts = {}  # 아이템별 구매 횟수 {item_id: count}
     player_gold = 1000  # 플레이어 골드
 
+    # 게임 진행 상태 저장
+    saved_wave = 1  # 저장된 웨이브
+    saved_kills = 0  # 저장된 처치 수
+    has_saved_game = False  # 저장된 게임이 있는지 여부
+
 # 상점 아이템 데이터
 weapons = [
     {'name': 'Basic Gun', 'desc': 'Standard weapon', 'price': 0, 'icon_id': 3},

@@ -94,9 +94,15 @@ def draw():
         else:
             button_image.draw(get_canvas_width() // 2, play_y, 250, 70)
 
-    # Play 텍스트
+    # Play 텍스트 (저장된 게임이 있으면 Continue로 표시)
     play_color = (255, 255, 100) if selected_button == 0 else (255, 255, 255)
-    font.draw(get_canvas_width() // 2 - 60, play_y - 15, 'PLAY', play_color)
+    if shop_mode.GameData.has_saved_game:
+        font.draw(get_canvas_width() // 2 - 100, play_y - 15, 'CONTINUE', play_color)
+        # 저장된 웨이브 정보 표시
+        wave_font = load_font('C:/Windows/Fonts/arial.ttf', 16)
+        wave_font.draw(get_canvas_width() // 2 - 80, play_y - 35, f'Wave {shop_mode.GameData.saved_wave}', (200, 200, 200))
+    else:
+        font.draw(get_canvas_width() // 2 - 60, play_y - 15, 'PLAY', play_color)
 
     # Shop 버튼
     shop_y = 120

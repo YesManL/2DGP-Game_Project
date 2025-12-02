@@ -21,17 +21,20 @@ cursor_image = None
 mouse_x, mouse_y = 400, 300
 
 def handle_events():
-    global mouse_x, mouse_y
+    global mouse_x, mouse_y, wave, enemies_killed, player_gold
     event_list = get_events()
     for event in event_list:
         if event.type == SDL_QUIT:
             game_framework.quit()
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
-            # 게임 종료 대신 타이틀 화면으로 이동
+            # 게임 상태 저장 후 타이틀 화면으로 이동
             import title_mode
             import shop_mode
-            # 현재 골드를 GameData에 저장
+            # 현재 게임 상태 저장
             shop_mode.GameData.player_gold = player_gold
+            shop_mode.GameData.saved_wave = wave
+            shop_mode.GameData.saved_kills = enemies_killed
+            shop_mode.GameData.has_saved_game = True
             game_framework.change_mode(title_mode)
         elif event.type == SDL_MOUSEMOTION:
             mouse_x, mouse_y = event.x, get_canvas_height() - event.y
@@ -84,9 +87,17 @@ def init():
     game_world.add_object(ui, 3)
 
     spawn_timer = 0
-    wave = 1
-    enemies_killed = 0
-    enemies_per_wave = 10
+
+    # 저장된 게임이 있으면 복원, 없으면 새 게임
+    if shop_mode.GameData.has_saved_game:
+        wave = shop_mode.GameData.saved_wave
+        enemies_killed = shop_mode.GameData.saved_kills
+        enemies_per_wave = 10 + (wave - 1) * 30  # 웨이브에 맞는 적 수 계산
+    else:
+        wave = 1
+        enemies_killed = 0
+        enemies_per_wave = 10
+
     wave_complete = False
     game_paused = False
     mouse_x, mouse_y = 400, 300
@@ -108,6 +119,10 @@ def update():
         gameover_mode.score = enemies_killed
         # 획득한 골드를 GameData에 저장 (다음 게임에도 유지)
         shop_mode.GameData.player_gold = player_gold
+        # 게임오버 시 저장된 게임 상태 초기화
+        shop_mode.GameData.has_saved_game = False
+        shop_mode.GameData.saved_wave = 1
+        shop_mode.GameData.saved_kills = 0
         game_framework.change_mode(gameover_mode)
         return
 
