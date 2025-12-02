@@ -143,7 +143,7 @@ def update():
     ui.enemies_needed = enemies_per_wave - enemies_killed
 
 def next_wave():
-    global wave, enemies_per_wave, wave_complete, spawn_interval, game_paused
+    global wave, enemies_per_wave, wave_complete, spawn_interval, game_paused, player_gold
 
     wave += 1
     enemies_per_wave += 30  # 웨이브마다 30마리씩 증가 (25에서 증가!)
@@ -152,10 +152,11 @@ def next_wave():
     # 적 스폰 속도 매우 빠르게 증가 (최소 0.1초)
     spawn_interval = max(0.1, spawn_interval - 0.3)
 
-    # 레벨업 화면으로 전환
+    # 상점으로 이동 (골드를 상점에 동기화)
     game_paused = True
-    import upgrade_mode
-    game_framework.push_mode(upgrade_mode)
+    import shop_mode
+    shop_mode.GameData.player_gold = player_gold
+    game_framework.push_mode(shop_mode)
 
 def spawn_enemy():
     # 화면 가장자리에서 적 생성
