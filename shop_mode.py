@@ -21,7 +21,7 @@ class GameData:
 weapons = [
     {'name': 'Basic Gun', 'desc': 'Standard weapon', 'price': 0, 'icon_id': 3},
     {'name': 'Shotgun', 'desc': 'Spread shot', 'price': 500, 'icon_id': 4},
-    {'name': 'Laser Gun', 'desc': 'Continuous beam', 'price': 800, 'icon_id': 5}
+    {'name': 'Explosive Gun', 'desc': 'Area explosion', 'price': 800, 'icon_id': 5}
 ]
 
 items = [

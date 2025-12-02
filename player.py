@@ -64,6 +64,7 @@ class Player:
         self.bullet_damage = 10  # 총알 데미지
         self.bullet_speed = 300  # 총알 속도
         self.level = 1
+        self.weapon_type = 0  # 0: Basic Gun, 1: Shotgun, 2: Explosive Gun
 
     def update(self):
         dt = game_framework.frame_time
@@ -251,7 +252,7 @@ class Player:
 
     def fire(self):
         if self.fire_cooldown <= 0:
-            from bullet import Bullet
+            from bullet import Bullet, ExplosiveBullet
 
             # 터렛의 실제 베이스 위치 계산 (차체 회전 고려)
             turret_base_offset = -5
@@ -293,12 +294,14 @@ class Player:
                     game_world.add_object(bullet, 2)
                 self.fire_cooldown = self.fire_rate * 1.5  # 발사 속도 느림
 
-            elif self.weapon_type == 2:  # Laser Gun - 관통 레이저 (빠른 연사)
-                bullet = Bullet(bullet_x, bullet_y, self.turret_angle,
-                              self.bullet_speed * 1.5,  # 매우 빠름
-                              self.bullet_damage * 0.8)  # 약간 약함
+            elif self.weapon_type == 2:  # Explosive Gun - 폭발탄 (광역)
+                bullet = ExplosiveBullet(bullet_x, bullet_y, self.turret_angle,
+                                       speed=250,  # 느린 속도
+                                       damage=self.bullet_damage * 1.2,  # 높은 데미지
+                                       explosion_radius=100)  # 넓은 폭발 반경
                 game_world.add_object(bullet, 2)
-                self.fire_cooldown = self.fire_rate * 0.3  # 매우 빠른 연사
+                game_world.add_collision_pair('bullet:enemy', bullet, None)
+                self.fire_cooldown = self.fire_rate * 2.0  # 매우 느린 연사
 
     def get_bb(self):
         return self.x - 30, self.y - 30, self.x + 30, self.y + 30
