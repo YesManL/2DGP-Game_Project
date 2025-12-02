@@ -159,6 +159,11 @@ def increase_kill_count():
 def draw():
     clear_canvas()
     game_world.render()
+
+    # 커스텀 커서 그리기 (가장 마지막에 그려서 모든 것 위에 표시)
+    if cursor_image:
+        cursor_image.draw(mouse_x, mouse_y, 50, 50)
+
     update_canvas()
 
 def finish():
