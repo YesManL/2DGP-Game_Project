@@ -8,6 +8,7 @@ class GameData:
     selected_weapon = 0  # 0: 기본 총, 1: 샷건, 2: 레이저
     selected_items = []  # 현재 적용 대기 중인 아이템 (웨이브 완료 후)
     purchased_items = []  # 영구 구매한 아이템 (타이틀 상점)
+    item_counts = {}  # 아이템별 구매 횟수 {item_id: count}
     player_gold = 1000  # 플레이어 골드
 
 # 상점 아이템 데이터
