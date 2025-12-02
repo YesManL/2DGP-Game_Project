@@ -46,8 +46,8 @@ class Enemy:
                 self.x += (dx / distance) * self.speed * game_framework.frame_time
                 self.y += (dy / distance) * self.speed * game_framework.frame_time
 
-        # 공격 사거리 안이면 총알 발사
-        if distance <= self.attack_range:
+        # 공격 사거리 안이면 총알 발사 (단, 화면 안에 있을 때만)
+        if distance <= self.attack_range and self.is_on_screen():
             self.fire_cooldown -= game_framework.frame_time
             if self.fire_cooldown <= 0:
                 self.fire_bullet()
@@ -56,6 +56,17 @@ class Enemy:
         # 피격 플래시 감소
         if self.hit_flash > 0:
             self.hit_flash -= game_framework.frame_time
+
+    def is_on_screen(self):
+        """적이 화면 안에 있는지 확인"""
+        canvas_width = get_canvas_width()
+        canvas_height = get_canvas_height()
+
+        # 여유 공간을 둬서 화면 경계 근처에서도 총을 쏠 수 있게 함
+        margin = 50
+
+        return (-margin <= self.x <= canvas_width + margin and
+                -margin <= self.y <= canvas_height + margin)
 
     def fire_bullet(self):
         """플레이어를 향해 총알 발사 - 총구 위치에서 발사"""
