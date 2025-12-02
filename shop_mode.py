@@ -178,12 +178,21 @@ def purchase_item():
             GameData.selected_items.append(selected_index)
 
 def draw():
-    clear_canvas()
+    # clear_canvas는 여기서 하지 않음 - 배경 모드가 이미 그려져 있음
 
     canvas_width = get_canvas_width()
     canvas_height = get_canvas_height()
 
-    # 어두운 배경 (게임 화면 그리기 제거 - 깜빡임 방지)
+    # 배경에 게임 화면 그리기 (스택에서 이전 모드가 있으면)
+    import game_framework
+    if len(game_framework.stack) > 1:
+        # 상점 아래에 있는 모드 그리기 (play_mode 또는 title_mode)
+        clear_canvas()  # 여기서 clear
+        game_framework.stack[-2].draw()
+    else:
+        clear_canvas()
+
+    # 반투명 어두운 오버레이 (게임 화면 위에)
     from pico2d import draw_rectangle
     draw_rectangle(0, 0, canvas_width, canvas_height)
 
