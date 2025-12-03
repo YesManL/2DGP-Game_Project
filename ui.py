@@ -64,10 +64,10 @@ class UI:
         if self.profile_icon:
             self.profile_icon.draw(profile_x - 60, profile_y, 50, 50)
 
-        # 플레이어 레벨 표시
+        # 웨이브 레벨 표시 (프로필 하단)
         if self.diamond_icon:
             self.diamond_icon.draw(profile_x - 35, profile_y - 25, 20, 20)
-        self.small_font.draw(profile_x - 25, profile_y - 30, f'Lv.{self.player.level}', (255, 255, 100))
+        self.small_font.draw(profile_x - 25, profile_y - 30, f'Lv.{self.wave}', (255, 255, 100))
 
         # HP 디스플레이
         hp_x = 150
@@ -100,7 +100,11 @@ class UI:
         if self.icon_wave:
             self.icon_wave.draw(info_x - 100, info_y, 25, 25)
 
-        self.font.draw(info_x - 80, info_y - 5, f'Wave: {self.wave}', (255, 255, 255))
+        # 3의 배수 웨이브는 보너스 웨이브로 표시
+        if self.wave % 3 == 0:
+            self.font.draw(info_x - 80, info_y - 5, f'BONUS Wave: {self.wave}', (255, 215, 0))
+        else:
+            self.font.draw(info_x - 80, info_y - 5, f'Wave: {self.wave}', (255, 255, 255))
 
         # 처치 수 정보
         if self.display_panel:
