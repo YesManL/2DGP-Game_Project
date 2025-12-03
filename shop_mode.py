@@ -28,7 +28,8 @@ items = [
     {'name': 'HP Boost', 'desc': '+50 Max HP', 'price': 300, 'icon_id': 5},
     {'name': 'Speed Up', 'desc': '+20% Speed', 'price': 250, 'icon_id': 6},
     {'name': 'Damage Up', 'desc': '+30% Damage', 'price': 400, 'icon_id': 3},
-    {'name': 'Fire Rate', 'desc': '+25% Fire Rate', 'price': 350, 'icon_id': 4}
+    {'name': 'Fire Rate', 'desc': '+25% Fire Rate', 'price': 350, 'icon_id': 4},
+    {'name': 'HP Refill', 'desc': 'Full HP Restore', 'price': 200, 'icon_id': 7}
 ]
 
 # 상점 UI 변수
@@ -136,6 +137,9 @@ def apply_items_and_return():
             player.bullet_damage = int(player.bullet_damage * 1.3)
         elif item['name'] == 'Fire Rate':
             player.fire_rate = max(0.05, player.fire_rate * 0.75)
+        elif item['name'] == 'HP Refill':
+            # 즉시 체력 풀충전
+            player.hp = player.max_hp
 
     # 구매한 아이템 리스트 초기화 (중복 적용 방지)
     GameData.selected_items = []
@@ -168,14 +172,16 @@ def purchase_item():
         if GameData.player_gold >= item['price']:
             GameData.player_gold -= item['price']
 
-            # 구매 횟수 증가
-            if selected_index not in GameData.item_counts:
-                GameData.item_counts[selected_index] = 0
-            GameData.item_counts[selected_index] += 1
+            # HP Refill은 카운트하지 않음 (즉시 효과만)
+            if item['name'] != 'HP Refill':
+                # 구매 횟수 증가
+                if selected_index not in GameData.item_counts:
+                    GameData.item_counts[selected_index] = 0
+                GameData.item_counts[selected_index] += 1
 
-            # 첫 구매 시 purchased_items에 추가
-            if selected_index not in GameData.purchased_items:
-                GameData.purchased_items.append(selected_index)
+                # 첫 구매 시 purchased_items에 추가
+                if selected_index not in GameData.purchased_items:
+                    GameData.purchased_items.append(selected_index)
 
             # 적용 대기 목록에 추가 (웨이브 완료 시 적용용)
             GameData.selected_items.append(selected_index)
@@ -229,18 +235,22 @@ def draw():
 
     # 아이템 목록 표시
     items_to_show = weapons if selected_tab == 0 else items
-    start_y = canvas_height - 230
+    start_y = canvas_height - 200  # 230에서 200으로 올림
 
     for i, item in enumerate(items_to_show):
-        y = start_y - i * 90
+        y = start_y - i * 75  # 90에서 75로 간격 축소
+
+        # 화면 밖으로 나가면 그리지 않음
+        if y < 80:
+            continue
 
         # 선택된 아이템 - 애니메이션 제거 (깜빡임 방지)
         if i == selected_index:
             if button_selected:
-                button_selected.draw(canvas_width // 2, y, 600, 70)
+                button_selected.draw(canvas_width // 2, y, 600, 60)  # 높이도 70에서 60으로 축소
         else:
             if button_image:
-                button_image.draw(canvas_width // 2, y, 600, 70)
+                button_image.draw(canvas_width // 2, y, 600, 60)
 
         # 아이콘
         if item['icon_id'] in icon_images:
@@ -264,18 +274,19 @@ def draw():
                 elif i in GameData.purchased_weapons:
                     font.draw(canvas_width // 2 + 220, y - 5, '[Owned]', (150, 150, 255))
             elif selected_tab == 1:  # 아이템 탭
-                if i in GameData.purchased_items:
+                # HP Refill은 카운트 표시 안함
+                if items[i]['name'] != 'HP Refill' and i in GameData.purchased_items:
                     # 구매 횟수 표시
                     count = GameData.item_counts.get(i, 0)
                     font.draw(canvas_width // 2 + 220, y - 5, f'x{count}', (100, 255, 100))
 
     # 하단 안내 메시지
     if display_panel:
-        display_panel.draw(canvas_width // 2, 60, 700, 50)
+        display_panel.draw(canvas_width // 2, 40, 700, 50)
     if font:
         # 깜빡임 제거 - 고정된 색상 사용
         text_color = (200, 200, 200)
-        font.draw(canvas_width // 2 - 320, 55, 'Arrow Keys: Navigate | Enter: Buy | ESC: Continue Play', text_color)
+        font.draw(canvas_width // 2 - 320, 35, 'Arrow Keys: Navigate | Enter: Buy | ESC: Continue Play', text_color)
 
     update_canvas()
 
