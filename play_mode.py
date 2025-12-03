@@ -5,7 +5,7 @@ import random
 
 from background import Background
 from player import Player
-from enemy import Enemy
+from enemy import Enemy, BossBanditHG, BossBanditRPG
 from ui import UI
 
 player = None
@@ -56,6 +56,48 @@ def init():
     # SDL 커서 숨기기
     SDL_ShowCursor(SDL_DISABLE)
 
+    # 폭발 이펙트 이미지 미리 로드 (렉 방지)
+    from explosion import Explosion, BossExplosion
+    from bullet import ExplosiveBullet
+    from enemy import BossExplosiveBullet
+
+    if Explosion.images is None:
+        Explosion.images = []
+        for i in range(1, 11):
+            try:
+                img = load_image(f'./05.VFX/VFX_Explosion/VFX_Explosion_1/VFX_Explosion_1_{i:04d}.png')
+                Explosion.images.append(img)
+            except:
+                pass
+
+    if BossExplosion.images is None:
+        BossExplosion.images = []
+        for i in range(1, 11):
+            try:
+                img = load_image(f'./05.VFX/VFX_Explosion/VFX_Explosion_1/VFX_Explosion_1_{i:04d}.png')
+                BossExplosion.images.append(img)
+            except:
+                pass
+
+    # 폭발탄 이미지 미리 로드
+    if ExplosiveBullet.images is None:
+        ExplosiveBullet.images = []
+        for i in range(1, 8):
+            try:
+                frame_file = f'05.VFX/VFX_Bullet/VFX_Bullet_1/VFX_Bullet_1_{i:04d}.png'
+                ExplosiveBullet.images.append(load_image(frame_file))
+            except:
+                pass
+
+    if BossExplosiveBullet.images is None:
+        BossExplosiveBullet.images = []
+        for i in range(1, 8):
+            try:
+                frame_file = f'05.VFX/VFX_Bullet/VFX_Bullet_1/VFX_Bullet_1_{i:04d}.png'
+                BossExplosiveBullet.images.append(load_image(frame_file))
+            except:
+                pass
+
     # 배경 생성
     background = Background()
     game_world.add_object(background, 0)
@@ -95,7 +137,8 @@ def init():
     if shop_mode.GameData.has_saved_game:
         wave = shop_mode.GameData.saved_wave
         enemies_killed = shop_mode.GameData.saved_kills
-        enemies_per_wave = 10 + (wave - 1) * 30  # 웨이브에 맞는 적 수 계산
+        # 웨이브에 따라 적 수 계산
+        enemies_per_wave = 10 + (wave - 1) * 30
     else:
         wave = 1
         enemies_killed = 0
@@ -106,6 +149,7 @@ def init():
     mouse_x, mouse_y = 400, 300
     # 타이틀 상점에서 사용한 후 남은 골드로 시작
     player_gold = shop_mode.GameData.player_gold
+
 
 def update():
     global spawn_timer, spawn_interval, enemies_killed, wave, enemies_per_wave, wave_complete, game_paused
@@ -144,21 +188,23 @@ def update():
 
     # 충돌 페어 설정
     from bullet import EnemyBullet
+    from enemy import BossExplosiveBullet
+    from explosion import BossExplosion
 
-    bullets = [obj for obj in game_world.world[2] if not isinstance(obj, EnemyBullet)]
-    enemy_bullets = [obj for obj in game_world.world[2] if isinstance(obj, EnemyBullet)]
+    bullets = [obj for obj in game_world.world[2] if not isinstance(obj, EnemyBullet) and not isinstance(obj, BossExplosiveBullet)]
+    enemy_bullets = [obj for obj in game_world.world[2] if isinstance(obj, (EnemyBullet, BossExplosiveBullet, BossExplosion))]
     enemies = [obj for obj in game_world.world[1] if isinstance(obj, Enemy)]
 
-    # 플레이어 총알 vs 적
+    # 플레이어 총알 vs 적 (보스 포함)
     for bullet in bullets:
         for enemy in enemies:
             game_world.add_collision_pair('bullet:enemy', bullet, enemy)
 
-    # 플레이어 vs 적
+    # 플레이어 vs 적 (보스 포함)
     for enemy in enemies:
         game_world.add_collision_pair('player:enemy', player, enemy)
 
-    # 적 총알 vs 플레이어
+    # 적 총알 (보스 총알 포함) vs 플레이어
     for enemy_bullet in enemy_bullets:
         game_world.add_collision_pair('enemy_bullet:player', enemy_bullet, player)
 
@@ -173,11 +219,13 @@ def next_wave():
     global wave, enemies_per_wave, wave_complete, spawn_interval, game_paused, player_gold
 
     wave += 1
-    enemies_per_wave += 30  # 웨이브마다 30마리씩 증가 (25에서 증가!)
-    wave_complete = False
 
+    # 웨이브마다 적 수 증가 (웨이브 1: 10, 웨이브 2: 40, 웨이브 3: 70...)
+    enemies_per_wave = 10 + (wave - 1) * 30
     # 적 스폰 속도 매우 빠르게 증가 (최소 0.1초)
-    spawn_interval = max(0.1, spawn_interval - 0.3)
+    spawn_interval = max(0.1, 3.0 - (wave - 1) * 0.3)
+
+    wave_complete = False
 
     # 상점으로 이동 (골드를 상점에 동기화)
     game_paused = True
@@ -205,16 +253,31 @@ def spawn_enemy():
         x = 0
         y = random.randint(0, canvas_height)
 
-    # 웨이브가 높을수록 적 체력/속도 극극대폭 증가
-    enemy = Enemy(x, y, player)
-    enemy.hp = 30 + (wave - 1) * 100  # 기본 30, 웨이브당 +100 (극대폭 증가!)
-    enemy.max_hp = enemy.hp
-    enemy.speed = 50 + (wave - 1) * 20  # 기본 50, 웨이브당 +20 (매우 빠르게)
+    # 특수몹 스폰 확률 계산 (웨이브가 높을수록 증가)
+    # 웨이브 1: 10%, 웨이브 2: 15%, 웨이브 3: 20%...
+    special_chance = min(0.1 + (wave - 1) * 0.05, 0.3)  # 최대 30%
 
-    # 적 크기는 기본 크기(80) 유지 - 크기 변경 로직 제거
-    # (크기를 키우는 대신 적의 수를 늘리는 방식으로 난이도 증가)
+    if random.random() < special_chance:
+        # 특수몹 스폰 (50% 확률로 HG 또는 RPG)
+        enemy_type = random.randint(0, 1)
+
+        if enemy_type == 0:
+            # Bandit_HG (샷건)
+            enemy = BossBanditHG(x, y, player, wave)
+        else:
+            # Bandit_RPG (폭발탄)
+            enemy = BossBanditRPG(x, y, player, wave)
+    else:
+        # 일반 적 스폰
+        enemy = Enemy(x, y, player)
+        # 웨이브가 높을수록 적 체력/속도 극극대폭 증가
+        enemy.hp = 30 + (wave - 1) * 100  # 기본 30, 웨이브당 +100 (극대폭 증가!)
+        enemy.max_hp = enemy.hp
+        enemy.speed = 50 + (wave - 1) * 20  # 기본 50, 웨이브당 +20 (매우 빠르게)
+
 
     game_world.add_object(enemy, 1)
+
 
 def increase_kill_count():
     global enemies_killed
