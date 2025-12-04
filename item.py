@@ -8,7 +8,7 @@ class HPItem:
 
     def __init__(self, x, y):
         if not HPItem.image:
-            HPItem.image = load_image('03.아이템&아이콘/PNG/Item_1.png')
+            HPItem.image = load_image('03.아이템&아이콘/PNG/Item_9.png')
 
         self.x, self.y = x, y
         self.width, self.height = 30, 30
