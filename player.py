@@ -315,6 +315,9 @@ class Player:
             damage = other.damage if hasattr(other, 'damage') else 5
             self.hp -= damage
             self.invincible_time = self.invincible_duration
+        elif group == 'player:item':
+            # HP 아이템 획득 (아이템 자체에서 처리됨)
+            pass
 
     def reset_input_state(self):
         """입력 상태 초기화 - 업그레이드 화면 후 호출"""

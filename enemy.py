@@ -186,6 +186,13 @@ class Enemy:
                 import play_mode
                 play_mode.increase_kill_count()
                 play_mode.add_gold(self.gold_reward)  # 적에 따라 다른 골드 지급
+
+                # 일정 확률로 HP 회복 아이템 드롭 (30% 확률)
+                if random.random() < 0.3:
+                    from item import HPItem
+                    item = HPItem(self.x, self.y)
+                    game_world.add_object(item, 2)  # 아이템 레이어에 추가
+
                 game_world.remove_object(self)
 
 

@@ -190,10 +190,12 @@ def update():
     from bullet import EnemyBullet
     from enemy import BossExplosiveBullet
     from explosion import BossExplosion
+    from item import HPItem
 
     bullets = [obj for obj in game_world.world[2] if not isinstance(obj, EnemyBullet) and not isinstance(obj, BossExplosiveBullet)]
     enemy_bullets = [obj for obj in game_world.world[2] if isinstance(obj, (EnemyBullet, BossExplosiveBullet, BossExplosion))]
     enemies = [obj for obj in game_world.world[1] if isinstance(obj, Enemy)]
+    items = [obj for obj in game_world.world[2] if isinstance(obj, HPItem)]
 
     # 플레이어 총알 vs 적 (보스 포함)
     for bullet in bullets:
@@ -207,6 +209,10 @@ def update():
     # 적 총알 (보스 총알 포함) vs 플레이어
     for enemy_bullet in enemy_bullets:
         game_world.add_collision_pair('enemy_bullet:player', enemy_bullet, player)
+
+    # 플레이어 vs HP 아이템
+    for item in items:
+        game_world.add_collision_pair('player:item', player, item)
 
     game_world.handle_collisions()
 
