@@ -11,9 +11,22 @@ RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
 RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
 
 class Player:
+    fire_sound = None  # 플레이어 발사 사운드 (클래스 변수)
+    get_hit_sound = None  # 플레이어 피격 사운드
+
     def __init__(self):
         self.x, self.y = 400, 300
         self.speed = RUN_SPEED_PPS
+
+        # 발사 사운드 로드
+        if not Player.fire_sound:
+            Player.fire_sound = load_wav('SFX/Player/Fire.mp3')
+            Player.fire_sound.set_volume(35)
+
+        # 피격 사운드 로드
+        if not Player.get_hit_sound:
+            Player.get_hit_sound = load_wav('SFX/Player/Get_Hit.mp3')
+            Player.get_hit_sound.set_volume(40)
 
         # 후륜 자동차 물리 시스템
         self.chassis_angle = 0  # 차체 각도 (이동 방향)
@@ -252,6 +265,10 @@ class Player:
 
     def fire(self):
         if self.fire_cooldown <= 0:
+            # 발사 사운드 재생
+            if Player.fire_sound:
+                Player.fire_sound.play()
+
             from bullet import Bullet, ExplosiveBullet
 
             # 터렛의 실제 베이스 위치 계산 (차체 회전 고려)
@@ -308,9 +325,15 @@ class Player:
 
     def handle_collision(self, group, other):
         if group == 'player:enemy' and self.invincible_time <= 0:
+            # 피격 사운드 재생
+            if Player.get_hit_sound:
+                Player.get_hit_sound.play()
             self.hp -= 5
             self.invincible_time = self.invincible_duration
         elif group == 'enemy_bullet:player' and self.invincible_time <= 0:
+            # 피격 사운드 재생
+            if Player.get_hit_sound:
+                Player.get_hit_sound.play()
             # 적 총알에 맞았을 때
             damage = other.damage if hasattr(other, 'damage') else 5
             self.hp -= damage
