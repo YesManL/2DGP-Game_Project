@@ -5,10 +5,16 @@ import game_world
 class HPItem:
     """HP 회복 아이템"""
     image = None
+    item_get_sound = None  # 아이템 획득 사운드
 
     def __init__(self, x, y):
         if not HPItem.image:
             HPItem.image = load_image('03.아이템&아이콘/PNG/Item_9.png')
+
+        # 아이템 획득 사운드 로드
+        if not HPItem.item_get_sound:
+            HPItem.item_get_sound = load_wav('SFX/Player/Item_Get.mp3')
+            HPItem.item_get_sound.set_volume(30)
 
         self.x, self.y = x, y
         self.width, self.height = 30, 30
@@ -45,6 +51,10 @@ class HPItem:
     def handle_collision(self, group, other):
         """플레이어와 충돌 시 HP 회복"""
         if group == 'player:item':
+            # 아이템 획득 사운드 재생
+            if HPItem.item_get_sound:
+                HPItem.item_get_sound.play()
+
             # 플레이어 HP 회복
             if other.hp < other.max_hp:
                 other.hp = min(other.max_hp, other.hp + self.hp_recovery)
