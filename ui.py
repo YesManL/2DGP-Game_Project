@@ -100,11 +100,8 @@ class UI:
         if self.icon_wave:
             self.icon_wave.draw(info_x - 100, info_y, 25, 25)
 
-        # 3의 배수 웨이브는 보너스 웨이브로 표시
-        if self.wave % 3 == 0:
-            self.font.draw(info_x - 80, info_y - 5, f'BONUS Wave: {self.wave}', (255, 215, 0))
-        else:
-            self.font.draw(info_x - 80, info_y - 5, f'Wave: {self.wave}', (255, 255, 255))
+        # 웨이브 번호 표시
+        self.font.draw(info_x - 80, info_y - 5, f'Wave: {self.wave}', (255, 255, 255))
 
         # 처치 수 정보
         if self.display_panel:
