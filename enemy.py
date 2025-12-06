@@ -7,6 +7,8 @@ import random
 class Enemy:
     images = []  # Bandit_AR 이미지 리스트 (여러 변형)
     leg_images = []  # 다리 애니메이션 이미지
+    death_sounds = []  # 적 죽음 사운드
+    ar_fire_sound = None  # AR 발사 사운드
 
     def __init__(self, x, y, target, wave=1):
         self.x, self.y = x, y
@@ -30,6 +32,18 @@ class Enemy:
         if not Enemy.leg_images:
             for i in [1, 2, 3]:
                 Enemy.leg_images.append(load_image(f'01.캐릭터&몬스터&애니메이션/적/Bandit_AR/스파인/PNG/Bandit_Leg_{i}.png'))
+
+        # 죽음 사운드 로드
+        if not Enemy.death_sounds:
+            for i in [1, 2, 3]:
+                sound = load_wav(f'SFX/Enemy/Enemy_Dead_{i}.mp3')
+                sound.set_volume(30)  # 볼륨 설정 (0~128)
+                Enemy.death_sounds.append(sound)
+
+        # AR 발사 사운드 로드
+        if not Enemy.ar_fire_sound:
+            Enemy.ar_fire_sound = load_wav('SFX/Enemy/AR_Fire.mp3')
+            Enemy.ar_fire_sound.set_volume(25)
 
         # 각 적마다 랜덤하게 이미지 선택
         self.image = random.choice(Enemy.images)
@@ -107,6 +121,10 @@ class Enemy:
         """플레이어를 향해 총알 발사 - 총구 위치에서 발사"""
         from bullet import EnemyBullet
 
+        # AR 발사 사운드 재생
+        if Enemy.ar_fire_sound:
+            Enemy.ar_fire_sound.play()
+
         # 플레이어 방향으로 총알 생성
         dx = self.target.x - self.x
         dy = self.target.y - self.y
@@ -146,9 +164,6 @@ class Enemy:
                                            draw_angle, '',
                                            self.x, self.y,
                                            self.width, self.height)
-            # 추가로 빨간색 사각형 오버레이
-            draw_rectangle(self.x - self.width//2, self.y - self.height//2,
-                         self.x + self.width//2, self.y + self.height//2)
         else:
             self.image.rotate_draw(draw_angle, self.x, self.y, self.width, self.height)
 
@@ -183,6 +198,12 @@ class Enemy:
             if self.hp <= 0 and not self.is_dead:
                 # 적이 죽으면 카운트 증가 및 골드 지급 (한 번만)
                 self.is_dead = True
+
+                # 죽음 사운드 랜덤 재생
+                if Enemy.death_sounds:
+                    death_sound = random.choice(Enemy.death_sounds)
+                    death_sound.play()
+
                 import play_mode
                 play_mode.increase_kill_count()
                 play_mode.add_gold(self.gold_reward)  # 적에 따라 다른 골드 지급
@@ -236,6 +257,10 @@ class BossBanditHG(Enemy):
         """샷건 패턴: 3발의 산탄 발사"""
         from bullet import EnemyBullet
 
+        # AR 발사 사운드 재생 (샷건도 일반 총 사운드 사용)
+        if Enemy.ar_fire_sound:
+            Enemy.ar_fire_sound.play()
+
         dx = self.target.x - self.x
         dy = self.target.y - self.y
 
@@ -275,8 +300,6 @@ class BossBanditHG(Enemy):
                                            draw_angle, '',
                                            self.x, self.y,
                                            self.width, self.height)
-            draw_rectangle(self.x - self.width//2, self.y - self.height//2,
-                         self.x + self.width//2, self.y + self.height//2)
         else:
             self.image.rotate_draw(draw_angle, self.x, self.y, self.width, self.height)
 
@@ -300,6 +323,7 @@ class BossBanditHG(Enemy):
 class BossBanditRPG(Enemy):
     boss_images = []
     boss_leg_images = []
+    rpg_fire_sound = None  # RPG 발사 사운드
 
     def __init__(self, x, y, target, wave=1):
         super().__init__(x, y, target, wave)
@@ -314,6 +338,11 @@ class BossBanditRPG(Enemy):
         if not BossBanditRPG.boss_leg_images:
             for i in [1, 2, 3]:
                 BossBanditRPG.boss_leg_images.append(load_image(f'01.캐릭터&몬스터&애니메이션/적/Bandit_RPG/스파인/PNG/Bandit_Leg_{i}.png'))
+
+        # RPG 발사 사운드 로드
+        if not BossBanditRPG.rpg_fire_sound:
+            BossBanditRPG.rpg_fire_sound = load_wav('SFX/Enemy/RPG_Fire.mp3')
+            BossBanditRPG.rpg_fire_sound.set_volume(35)  # RPG는 좀 더 크게
 
         # 각 특수몹마다 랜덤하게 이미지 선택
         self.image = random.choice(BossBanditRPG.boss_images)
@@ -331,6 +360,10 @@ class BossBanditRPG(Enemy):
     def fire_bullet(self):
         """폭발탄 발사"""
         from bullet import ExplosiveBullet
+
+        # RPG 발사 사운드 재생
+        if BossBanditRPG.rpg_fire_sound:
+            BossBanditRPG.rpg_fire_sound.play()
 
         dx = self.target.x - self.x
         dy = self.target.y - self.y
@@ -366,8 +399,6 @@ class BossBanditRPG(Enemy):
                                            draw_angle, '',
                                            self.x, self.y,
                                            self.width, self.height)
-            draw_rectangle(self.x - self.width//2, self.y - self.height//2,
-                         self.x + self.width//2, self.y + self.height//2)
         else:
             self.image.rotate_draw(draw_angle, self.x, self.y, self.width, self.height)
 
