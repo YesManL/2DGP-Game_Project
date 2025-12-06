@@ -5,11 +5,21 @@ import game_world
 class Explosion:
     """폭발 이펙트 - 애니메이션 재생 후 광역 피해"""
     images = None  # 폭발 애니메이션 프레임
+    explosion_sound = None  # 폭발 사운드
 
     def __init__(self, x, y, damage, radius):
         self.x, self.y = x, y
         self.damage = damage  # 광역 피해량
         self.radius = radius  # 폭발 반경
+
+        # 폭발 사운드 로드
+        if Explosion.explosion_sound is None:
+            Explosion.explosion_sound = load_wav('SFX/Player/Explosion.mp3')
+            Explosion.explosion_sound.set_volume(40)
+
+        # 폭발 사운드 재생 (생성 시 즉시)
+        if Explosion.explosion_sound:
+            Explosion.explosion_sound.play()
 
         # 폭발 애니메이션
         if Explosion.images is None:
@@ -92,6 +102,10 @@ class BossExplosion:
         self.x, self.y = x, y
         self.damage = damage
         self.radius = radius
+
+        # 폭발 사운드 재생 (Explosion 클래스의 사운드 사용)
+        if Explosion.explosion_sound:
+            Explosion.explosion_sound.play()
 
         # 폭발 애니메이션 (동일한 이미지 사용)
         if BossExplosion.images is None:
