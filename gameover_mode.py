@@ -1,6 +1,7 @@
 from pico2d import *
 import game_framework
 import title_mode
+import shop_mode
 import math
 
 # 모듈 레벨 변수
@@ -44,6 +45,8 @@ def handle_events():
             if event.key == SDLK_ESCAPE:
                 game_framework.quit()
             elif event.key == SDLK_SPACE:
+                # 게임 데이터 초기화 (구매한 아이템, 무기, 골드 등)
+                shop_mode.GameData.reset()
                 game_framework.change_mode(title_mode)
 
 def draw():
