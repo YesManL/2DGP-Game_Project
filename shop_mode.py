@@ -17,6 +17,19 @@ class GameData:
     saved_kills = 0  # 저장된 처치 수
     has_saved_game = False  # 저장된 게임이 있는지 여부
 
+    @classmethod
+    def reset(cls):
+        """게임 데이터 초기화 - 게임오버 시 호출"""
+        cls.selected_weapon = 0
+        cls.selected_items = []
+        cls.purchased_items = []
+        cls.purchased_weapons = [0]  # 기본 무기만 소유
+        cls.item_counts = {}
+        cls.player_gold = 1000  # 초기 골드로 리셋
+        cls.saved_wave = 1
+        cls.saved_kills = 0
+        cls.has_saved_game = False
+
 # 상점 아이템 데이터
 weapons = [
     {'name': 'Basic Gun', 'desc': 'Standard weapon', 'price': 0, 'icon_id': 3},
@@ -43,14 +56,39 @@ icon_images = {}
 gold_icon = None
 selected_tab = 0  # 0: 무기, 1: 아이템
 selected_index = 0
+button_press_sound = None  # 버튼 선택 사운드
+start_buy_sound = None  # 구매 사운드
+bg_tile = None  # 배경 타일
 
 def init():
     global animation_time, font, title_font, button_image, button_selected, display_panel, icon_images, gold_icon
-    global selected_tab, selected_index
+    global selected_tab, selected_index, button_press_sound, start_buy_sound, bg_tile
 
     animation_time = 0
     selected_tab = 0
     selected_index = 0
+
+    # 사운드 로드
+    if button_press_sound is None:
+        try:
+            button_press_sound = load_wav('SFX/Button_Press.mp3')
+            button_press_sound.set_volume(40)
+        except:
+            pass
+
+    if start_buy_sound is None:
+        try:
+            start_buy_sound = load_wav('SFX/Start_Buy.mp3')
+            start_buy_sound.set_volume(50)
+        except:
+            pass
+
+    # 배경 타일 로드
+    if bg_tile is None:
+        try:
+            bg_tile = load_image('./02.배경&프랍/4.맵/PNG/Maptile_1.png')
+        except:
+            pass
 
     # 폰트 로드
     try:
@@ -91,15 +129,27 @@ def handle_events():
                 # 상점 종료하고 플레이로 복귀 (골드와 아이템 적용)
                 apply_items_and_return()
             elif event.key == SDLK_LEFT:
+                # 탭 변경 시 사운드 재생
+                if button_press_sound:
+                    button_press_sound.play()
                 selected_tab = 0  # 무기 탭
             elif event.key == SDLK_RIGHT:
+                # 탭 변경 시 사운드 재생
+                if button_press_sound:
+                    button_press_sound.play()
                 selected_tab = 1  # 아이템 탭
             elif event.key == SDLK_UP or event.key == SDLK_w:
+                # 아이템 선택 변경 시 사운드 재생
+                if button_press_sound:
+                    button_press_sound.play()
                 if selected_tab == 0:
                     selected_index = (selected_index - 1) % len(weapons)
                 else:
                     selected_index = (selected_index - 1) % len(items)
             elif event.key == SDLK_DOWN or event.key == SDLK_s:
+                # 아이템 선택 변경 시 사운드 재생
+                if button_press_sound:
+                    button_press_sound.play()
                 if selected_tab == 0:
                     selected_index = (selected_index + 1) % len(weapons)
                 else:
@@ -161,11 +211,17 @@ def purchase_item():
         # 이미 구매한 무기면 무료로 교체
         if selected_index in GameData.purchased_weapons:
             GameData.selected_weapon = selected_index
+            # 무기 교체 시에는 버튼 사운드만 재생
+            if button_press_sound:
+                button_press_sound.play()
         # 구매하지 않은 무기면 골드로 구매
         elif GameData.player_gold >= weapon['price']:
             GameData.player_gold -= weapon['price']
             GameData.purchased_weapons.append(selected_index)
             GameData.selected_weapon = selected_index
+            # 구매 성공 시 구매 사운드 재생
+            if start_buy_sound:
+                start_buy_sound.play()
     else:  # 아이템 구매 - 무제한 구매 가능
         item = items[selected_index]
         # 골드가 충분하면 무제한 구매 가능
@@ -186,15 +242,30 @@ def purchase_item():
             # 적용 대기 목록에 추가 (웨이브 완료 시 적용용)
             GameData.selected_items.append(selected_index)
 
+            # 구매 성공 시 구매 사운드 재생
+            if start_buy_sound:
+                start_buy_sound.play()
+
 def draw():
     clear_canvas()
 
     canvas_width = get_canvas_width()
     canvas_height = get_canvas_height()
 
-    # 어두운 배경 (깜빡임 방지를 위해 게임 화면 그리기 제거)
-    from pico2d import draw_rectangle
-    draw_rectangle(0, 0, canvas_width, canvas_height)
+    # Maptile_1로 배경 채우기
+    if bg_tile:
+        tile_width = bg_tile.w
+        tile_height = bg_tile.h
+
+        # 화면을 타일로 채우기 (타일을 반복해서 그리기)
+        cols = (canvas_width // tile_width) + 2
+        rows = (canvas_height // tile_height) + 2
+
+        for row in range(rows):
+            for col in range(cols):
+                x = col * tile_width
+                y = row * tile_height
+                bg_tile.draw(x, y, tile_width, tile_height)
 
     # 타이틀
     if display_panel:

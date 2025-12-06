@@ -13,11 +13,21 @@ button_selected = None
 display_panel = None
 icon_images = {}
 animation_time = 0
+button_press_sound = None  # 버튼 선택 사운드
 
 def init():
     global selected_upgrade, upgrades, font, title_font, bg_overlay, button_base, button_selected, display_panel, icon_images, animation_time
+    global button_press_sound
     selected_upgrade = 0
     animation_time = 0
+
+    # 사운드 로드
+    if button_press_sound is None:
+        try:
+            button_press_sound = load_wav('SFX/Button_Press.mp3')
+            button_press_sound.set_volume(40)
+        except:
+            pass
 
     # 폰트 로드 (시스템 기본 폰트 사용)
     try:
@@ -133,10 +143,19 @@ def handle_events():
             if event.key == SDLK_ESCAPE:
                 game_framework.quit()
             elif event.key == SDLK_UP or event.key == SDLK_w:
+                # 업그레이드 선택 변경 시 사운드 재생
+                if button_press_sound:
+                    button_press_sound.play()
                 selected_upgrade = (selected_upgrade - 1) % len(upgrades)
             elif event.key == SDLK_DOWN or event.key == SDLK_s:
+                # 업그레이드 선택 변경 시 사운드 재생
+                if button_press_sound:
+                    button_press_sound.play()
                 selected_upgrade = (selected_upgrade + 1) % len(upgrades)
             elif event.key == SDLK_RETURN or event.key == SDLK_SPACE:
+                # 업그레이드 선택 시에는 버튼 사운드만 재생
+                if button_press_sound:
+                    button_press_sound.play()
                 apply_upgrade()
 
 def apply_upgrade():

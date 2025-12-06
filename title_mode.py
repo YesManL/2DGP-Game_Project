@@ -6,14 +6,39 @@ import math
 
 animation_time = 0
 selected_button = 0  # 0: Play, 1: Shop
+button_press_sound = None  # 버튼 선택 사운드
+start_buy_sound = None  # 시작/구매 사운드
 
 def init():
     global image, font, bg_image, button_image, animation_time, selected_button
+    global button_press_sound, start_buy_sound, bg_tile
     image = None
     bg_image = None
     button_image = None
+    bg_tile = None
     animation_time = 0
     selected_button = 0
+
+    # 사운드 로드
+    if button_press_sound is None:
+        try:
+            button_press_sound = load_wav('SFX/Button_Press.mp3')
+            button_press_sound.set_volume(40)
+        except:
+            pass
+
+    if start_buy_sound is None:
+        try:
+            start_buy_sound = load_wav('SFX/Start_Buy.mp3')
+            start_buy_sound.set_volume(50)
+        except:
+            pass
+
+    # 배경 타일 로드
+    try:
+        bg_tile = load_image('./02.배경&프랍/4.맵/PNG/Maptile_1.png')
+    except:
+        pass
 
     try:
         image = load_image('./99.etc/Title2.png')
@@ -47,32 +72,48 @@ def handle_events():
                 game_framework.quit()
             elif event.key == SDLK_SPACE or event.key == SDLK_RETURN:
                 if selected_button == 0:
+                    # Start 버튼만 Start_Buy 사운드 재생
+                    if start_buy_sound:
+                        start_buy_sound.play()
                     game_framework.change_mode(play_mode)
                 else:
+                    # 상점 버튼은 Button_Press 사운드 재생
+                    if button_press_sound:
+                        button_press_sound.play()
                     # 상점은 오버레이이므로 push_mode 사용
                     game_framework.push_mode(shop_mode)
             elif event.key == SDLK_UP or event.key == SDLK_w:
+                # 버튼 선택 변경 시 사운드 재생
+                if button_press_sound:
+                    button_press_sound.play()
                 selected_button = 0
             elif event.key == SDLK_DOWN or event.key == SDLK_s:
+                # 버튼 선택 변경 시 사운드 재생
+                if button_press_sound:
+                    button_press_sound.play()
                 selected_button = 1
 
 def draw():
-    global selected_button
+    global selected_button, bg_tile
     clear_canvas()
 
-    # 심플한 어두운 사막 테마 배경 (Sand Raider 테마에 맞게)
-    # 어두운 갈색~주황색 그라데이션 느낌
     canvas_width = get_canvas_width()
     canvas_height = get_canvas_height()
 
-    # 단색 배경 그리기 (어두운 사막색)
-    # pico2d의 draw_rectangle은 색상을 설정할 수 없으므로 clear_canvas의 기본 검정 사용
-    # 대신 조금 밝은 테두리로 깊이감 추가
+    # Maptile_1로 배경 채우기
+    if bg_tile:
+        tile_width = bg_tile.w
+        tile_height = bg_tile.h
 
-    # 상단 장식 라인
-    for i in range(5):
-        alpha = 50 - i * 10
-        # 상단 라인은 생략하고 깔끔하게
+        # 화면을 타일로 채우기 (타일을 반복해서 그리기)
+        cols = (canvas_width // tile_width) + 2
+        rows = (canvas_height // tile_height) + 2
+
+        for row in range(rows):
+            for col in range(cols):
+                x = col * tile_width
+                y = row * tile_height
+                bg_tile.draw(x, y, tile_width, tile_height)
 
     # 로고
     if image:
