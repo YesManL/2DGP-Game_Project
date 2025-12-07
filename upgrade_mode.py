@@ -2,6 +2,7 @@ from pico2d import *
 import game_framework
 import game_world
 import math
+from resource_path import resource_path
 
 selected_upgrade = 0
 upgrades = []
@@ -24,7 +25,7 @@ def init():
     # 사운드 로드
     if button_press_sound is None:
         try:
-            button_press_sound = load_wav('SFX/Button_Press.mp3')
+            button_press_sound = load_wav(resource_path('SFX/Button_Press.mp3'))
             button_press_sound.set_volume(40)
         except:
             pass
@@ -39,15 +40,15 @@ def init():
 
     # GUI 이미지 로드
     try:
-        button_base = load_image('./04.GUI/PNG/GUI_Main_Button_1_Base.png')
-        button_selected = load_image('./04.GUI/PNG/GUI_Main_Button_1.png')
-        display_panel = load_image('./04.GUI/PNG/Display_12.png')
+        button_base = load_image(resource_path('./04.GUI/PNG/GUI_Main_Button_1_Base.png'))
+        button_selected = load_image(resource_path('./04.GUI/PNG/GUI_Main_Button_1.png'))
+        display_panel = load_image(resource_path('./04.GUI/PNG/Display_12.png'))
 
         # 아이콘 이미지들
-        icon_images['damage'] = load_image('./03.아이템&아이콘/PNG/Item_3.png')
-        icon_images['fire_rate'] = load_image('./03.아이템&아이콘/PNG/Item_4.png')
-        icon_images['hp'] = load_image('./03.아이템&아이콘/PNG/Item_5.png')
-        icon_images['speed'] = load_image('./03.아이템&아이콘/PNG/Item_6.png')
+        icon_images['damage'] = load_image(resource_path('./03.아이템&아이콘/PNG/Item_3.png'))
+        icon_images['fire_rate'] = load_image(resource_path('./03.아이템&아이콘/PNG/Item_4.png'))
+        icon_images['hp'] = load_image(resource_path('./03.아이템&아이콘/PNG/Item_5.png'))
+        icon_images['speed'] = load_image(resource_path('./03.아이템&아이콘/PNG/Item_6.png'))
     except:
         pass
 

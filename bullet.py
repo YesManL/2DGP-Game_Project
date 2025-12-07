@@ -2,6 +2,7 @@ from pico2d import *
 import game_framework
 import game_world
 import math
+from resource_path import resource_path
 
 class Bullet:
     images = None
@@ -18,7 +19,7 @@ class Bullet:
             Bullet.images = []
             for i in range(1, 8):  # 7프레임
                 frame_file = f'05.VFX/VFX_Bullet/VFX_Bullet_1/VFX_Bullet_1_{i:04d}.png'
-                Bullet.images.append(load_image(frame_file))
+                Bullet.images.append(load_image(resource_path(frame_file)))
 
         # 애니메이션 관련
         self.frame = 0
@@ -75,7 +76,7 @@ class EnemyBullet:
             EnemyBullet.images = []
             for i in range(1, 8):  # 7프레임
                 frame_file = f'05.VFX/VFX_Bullet/VFX_Bullet_1/VFX_Bullet_1_{i:04d}.png'
-                EnemyBullet.images.append(load_image(frame_file))
+                EnemyBullet.images.append(load_image(resource_path(frame_file)))
 
         # 애니메이션 관련
         self.frame = 0
@@ -138,7 +139,7 @@ class ExplosiveBullet:
             ExplosiveBullet.images = []
             for i in range(1, 8):
                 frame_file = f'05.VFX/VFX_Bullet/VFX_Bullet_1/VFX_Bullet_1_{i:04d}.png'
-                ExplosiveBullet.images.append(load_image(frame_file))
+                ExplosiveBullet.images.append(load_image(resource_path(frame_file)))
 
         # 애니메이션 관련
         self.frame = 0

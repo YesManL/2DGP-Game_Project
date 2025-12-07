@@ -3,6 +3,7 @@ import game_framework
 import game_world
 import math
 import random
+from resource_path import resource_path
 
 class Enemy:
     images = []  # Bandit_AR 이미지 리스트 (여러 변형)
@@ -26,23 +27,23 @@ class Enemy:
         if not Enemy.images:
             # 다양한 Bandit_AR 스프라이트 로드 (1, 2, 3, 4, 5번 사용)
             for i in [1, 2, 3, 4, 5]:
-                Enemy.images.append(load_image(f'01.캐릭터&몬스터&애니메이션/적/Bandit_AR/스파인/PNG/Bandit_AR_{i}.png'))
+                Enemy.images.append(load_image(resource_path(f'01.캐릭터&몬스터&애니메이션/적/Bandit_AR/스파인/PNG/Bandit_AR_{i}.png')))
 
         # 다리 애니메이션 이미지 로드
         if not Enemy.leg_images:
             for i in [1, 2, 3]:
-                Enemy.leg_images.append(load_image(f'01.캐릭터&몬스터&애니메이션/적/Bandit_AR/스파인/PNG/Bandit_Leg_{i}.png'))
+                Enemy.leg_images.append(load_image(resource_path(f'01.캐릭터&몬스터&애니메이션/적/Bandit_AR/스파인/PNG/Bandit_Leg_{i}.png')))
 
         # 죽음 사운드 로드
         if not Enemy.death_sounds:
             for i in [1, 2, 3]:
-                sound = load_wav(f'SFX/Enemy/Enemy_Dead_{i}.mp3')
+                sound = load_wav(resource_path(f'SFX/Enemy/Enemy_Dead_{i}.mp3'))
                 sound.set_volume(30)  # 볼륨 설정 (0~128)
                 Enemy.death_sounds.append(sound)
 
         # AR 발사 사운드 로드
         if not Enemy.ar_fire_sound:
-            Enemy.ar_fire_sound = load_wav('SFX/Enemy/AR_Fire.mp3')
+            Enemy.ar_fire_sound = load_wav(resource_path('SFX/Enemy/AR_Fire.mp3'))
             Enemy.ar_fire_sound.set_volume(25)
 
         # 각 적마다 랜덤하게 이미지 선택
@@ -229,12 +230,12 @@ class BossBanditHG(Enemy):
         if not BossBanditHG.boss_images:
             # 다양한 Bandit_HG 스프라이트 로드 (1, 2, 3, 4, 5번 사용)
             for i in [1, 2, 3, 4, 5]:
-                BossBanditHG.boss_images.append(load_image(f'01.캐릭터&몬스터&애니메이션/적/Bandit_HG/스파인/PNG/Bandit_HG_{i}.png'))
+                BossBanditHG.boss_images.append(load_image(resource_path(f'01.캐릭터&몬스터&애니메이션/적/Bandit_HG/스파인/PNG/Bandit_HG_{i}.png')))
 
         # 다리 애니메이션 이미지 로드
         if not BossBanditHG.boss_leg_images:
             for i in [1, 2, 3]:
-                BossBanditHG.boss_leg_images.append(load_image(f'01.캐릭터&몬스터&애니메이션/적/Bandit_HG/스파인/PNG/Bandit_Leg_{i}.png'))
+                BossBanditHG.boss_leg_images.append(load_image(resource_path(f'01.캐릭터&몬스터&애니메이션/적/Bandit_HG/스파인/PNG/Bandit_Leg_{i}.png')))
 
         # 각 특수몹마다 랜덤하게 이미지 선택
         self.image = random.choice(BossBanditHG.boss_images)
@@ -332,16 +333,16 @@ class BossBanditRPG(Enemy):
         if not BossBanditRPG.boss_images:
             # 다양한 Bandit_RPG 스프라이트 로드 (1, 2, 3, 4, 5번 사용)
             for i in [1, 2, 3, 4, 5]:
-                BossBanditRPG.boss_images.append(load_image(f'01.캐릭터&몬스터&애니메이션/적/Bandit_RPG/스파인/PNG/Bandit_RPG_{i}.png'))
+                BossBanditRPG.boss_images.append(load_image(resource_path(f'01.캐릭터&몬스터&애니메이션/적/Bandit_RPG/스파인/PNG/Bandit_RPG_{i}.png')))
 
         # 다리 애니메이션 이미지 로드
         if not BossBanditRPG.boss_leg_images:
             for i in [1, 2, 3]:
-                BossBanditRPG.boss_leg_images.append(load_image(f'01.캐릭터&몬스터&애니메이션/적/Bandit_RPG/스파인/PNG/Bandit_Leg_{i}.png'))
+                BossBanditRPG.boss_leg_images.append(load_image(resource_path(f'01.캐릭터&몬스터&애니메이션/적/Bandit_RPG/스파인/PNG/Bandit_Leg_{i}.png')))
 
         # RPG 발사 사운드 로드
         if not BossBanditRPG.rpg_fire_sound:
-            BossBanditRPG.rpg_fire_sound = load_wav('SFX/Enemy/RPG_Fire.mp3')
+            BossBanditRPG.rpg_fire_sound = load_wav(resource_path('SFX/Enemy/RPG_Fire.mp3'))
             BossBanditRPG.rpg_fire_sound.set_volume(35)  # RPG는 좀 더 크게
 
         # 각 특수몹마다 랜덤하게 이미지 선택

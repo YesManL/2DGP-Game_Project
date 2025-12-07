@@ -1,5 +1,6 @@
 from pico2d import *
 from minimap import Minimap
+from resource_path import resource_path
 
 class UI:
     def __init__(self, player):
@@ -23,14 +24,14 @@ class UI:
         self.diamond_icon = None
 
         try:
-            self.hp_bar_base = load_image('./04.GUI/PNG/Display_2_Base.png')
-            self.hp_bar_fill = load_image('./04.GUI/PNG/Display_2_Fill.png')
-            self.display_panel = load_image('./04.GUI/PNG/Display_1.png')
-            self.top_line = load_image('./04.GUI/PNG/GUI_topline_1.png')
-            self.icon_wave = load_image('./03.아이템&아이콘/PNG/Item_1.png')
-            self.icon_kill = load_image('./03.아이템&아이콘/PNG/Item_2.png')
-            self.profile_icon = load_image('./04.GUI/PNG/Profile_Icon.png')
-            self.diamond_icon = load_image('./04.GUI/PNG/GUI_Diamond_1.png')
+            self.hp_bar_base = load_image(resource_path('./04.GUI/PNG/Display_2_Base.png'))
+            self.hp_bar_fill = load_image(resource_path('./04.GUI/PNG/Display_2_Fill.png'))
+            self.display_panel = load_image(resource_path('./04.GUI/PNG/Display_1.png'))
+            self.top_line = load_image(resource_path('./04.GUI/PNG/GUI_topline_1.png'))
+            self.icon_wave = load_image(resource_path('./03.아이템&아이콘/PNG/Item_1.png'))
+            self.icon_kill = load_image(resource_path('./03.아이템&아이콘/PNG/Item_2.png'))
+            self.profile_icon = load_image(resource_path('./04.GUI/PNG/Profile_Icon.png'))
+            self.diamond_icon = load_image(resource_path('./04.GUI/PNG/GUI_Diamond_1.png'))
         except:
             pass
 

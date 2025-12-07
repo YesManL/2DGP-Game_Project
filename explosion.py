@@ -1,6 +1,7 @@
 from pico2d import *
 import game_framework
 import game_world
+from resource_path import resource_path
 
 class Explosion:
     """폭발 이펙트 - 애니메이션 재생 후 광역 피해"""
@@ -14,7 +15,7 @@ class Explosion:
 
         # 폭발 사운드 로드
         if Explosion.explosion_sound is None:
-            Explosion.explosion_sound = load_wav('SFX/Player/Explosion.mp3')
+            Explosion.explosion_sound = load_wav(resource_path('SFX/Player/Explosion.mp3'))
             Explosion.explosion_sound.set_volume(40)
 
         # 폭발 사운드 재생 (생성 시 즉시)
@@ -26,7 +27,7 @@ class Explosion:
             Explosion.images = []
             for i in range(1, 11):  # 10프레임
                 try:
-                    img = load_image(f'./05.VFX/VFX_Explosion/VFX_Explosion_1/VFX_Explosion_1_{i:04d}.png')
+                    img = load_image(resource_path(f'./05.VFX/VFX_Explosion/VFX_Explosion_1/VFX_Explosion_1_{i:04d}.png'))
                     Explosion.images.append(img)
                 except:
                     pass
@@ -112,7 +113,7 @@ class BossExplosion:
             BossExplosion.images = []
             for i in range(1, 11):
                 try:
-                    img = load_image(f'./05.VFX/VFX_Explosion/VFX_Explosion_1/VFX_Explosion_1_{i:04d}.png')
+                    img = load_image(resource_path(f'./05.VFX/VFX_Explosion/VFX_Explosion_1/VFX_Explosion_1_{i:04d}.png'))
                     BossExplosion.images.append(img)
                 except:
                     pass

@@ -7,6 +7,7 @@ from background import Background
 from player import Player
 from enemy import Enemy, BossBanditHG, BossBanditRPG
 from ui import UI
+from resource_path import resource_path
 
 player = None
 ui = None
@@ -49,7 +50,7 @@ def init():
 
     # 커서 이미지 로드
     try:
-        cursor_image = load_image('./04.GUI/PNG/Cursor_Targeting.png')
+        cursor_image = load_image(resource_path('./04.GUI/PNG/Cursor_Targeting.png'))
     except:
         cursor_image = None
 
@@ -65,7 +66,7 @@ def init():
         Explosion.images = []
         for i in range(1, 11):
             try:
-                img = load_image(f'./05.VFX/VFX_Explosion/VFX_Explosion_1/VFX_Explosion_1_{i:04d}.png')
+                img = load_image(resource_path(f'./05.VFX/VFX_Explosion/VFX_Explosion_1/VFX_Explosion_1_{i:04d}.png'))
                 Explosion.images.append(img)
             except:
                 pass
@@ -74,7 +75,7 @@ def init():
         BossExplosion.images = []
         for i in range(1, 11):
             try:
-                img = load_image(f'./05.VFX/VFX_Explosion/VFX_Explosion_1/VFX_Explosion_1_{i:04d}.png')
+                img = load_image(resource_path(f'./05.VFX/VFX_Explosion/VFX_Explosion_1/VFX_Explosion_1_{i:04d}.png'))
                 BossExplosion.images.append(img)
             except:
                 pass

@@ -2,6 +2,7 @@ from pico2d import *
 import game_framework
 import game_world
 import math
+from resource_path import resource_path
 
 # Player 이동 속도 설정
 PIXEL_PER_METER = (10.0 / 0.3)
@@ -20,12 +21,12 @@ class Player:
 
         # 발사 사운드 로드
         if not Player.fire_sound:
-            Player.fire_sound = load_wav('SFX/Player/Fire.mp3')
+            Player.fire_sound = load_wav(resource_path('SFX/Player/Fire.mp3'))
             Player.fire_sound.set_volume(35)
 
         # 피격 사운드 로드
         if not Player.get_hit_sound:
-            Player.get_hit_sound = load_wav('SFX/Player/Get_Hit.mp3')
+            Player.get_hit_sound = load_wav(resource_path('SFX/Player/Get_Hit.mp3'))
             Player.get_hit_sound.set_volume(40)
 
         # 후륜 자동차 물리 시스템
@@ -58,10 +59,10 @@ class Player:
         self.tire_height = 20
 
         try:
-            self.chassis_image = load_image('./01.캐릭터&몬스터&애니메이션/차량/Vehicle/Vehicle_S_2/Vehicle_S_2_Chassis_1.png')
-            self.turret_image = load_image('./01.캐릭터&몬스터&애니메이션/차량/무장/PNG/Turret_S_5.png')
-            self.front_tire_image = load_image('./01.캐릭터&몬스터&애니메이션/차량/Vehicle/Vehicle_S_2/Vehicle_S_2_Tire_1.png')
-            self.rear_tire_image = load_image('./01.캐릭터&몬스터&애니메이션/차량/Vehicle/Vehicle_S_2/Vehicle_S_2_Tire_2.png')
+            self.chassis_image = load_image(resource_path('./01.캐릭터&몬스터&애니메이션/차량/Vehicle/Vehicle_S_2/Vehicle_S_2_Chassis_1.png'))
+            self.turret_image = load_image(resource_path('./01.캐릭터&몬스터&애니메이션/차량/무장/PNG/Turret_S_5.png'))
+            self.front_tire_image = load_image(resource_path('./01.캐릭터&몬스터&애니메이션/차량/Vehicle/Vehicle_S_2/Vehicle_S_2_Tire_1.png'))
+            self.rear_tire_image = load_image(resource_path('./01.캐릭터&몬스터&애니메이션/차량/Vehicle/Vehicle_S_2/Vehicle_S_2_Tire_2.png'))
         except:
             pass
 

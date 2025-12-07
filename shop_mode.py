@@ -1,6 +1,7 @@
 from pico2d import *
 import game_framework
 import math
+from resource_path import resource_path
 
 # 플레이어가 선택할 수 있는 아이템/무기
 class GameData:
@@ -71,14 +72,14 @@ def init():
     # 사운드 로드
     if button_press_sound is None:
         try:
-            button_press_sound = load_wav('SFX/Button_Press.mp3')
+            button_press_sound = load_wav(resource_path('SFX/Button_Press.mp3'))
             button_press_sound.set_volume(40)
         except:
             pass
 
     if start_buy_sound is None:
         try:
-            start_buy_sound = load_wav('SFX/Start_Buy.mp3')
+            start_buy_sound = load_wav(resource_path('SFX/Start_Buy.mp3'))
             start_buy_sound.set_volume(50)
         except:
             pass
@@ -86,7 +87,7 @@ def init():
     # 배경 타일 로드
     if bg_tile is None:
         try:
-            bg_tile = load_image('./02.배경&프랍/4.맵/PNG/Maptile_1.png')
+            bg_tile = load_image(resource_path('./02.배경&프랍/4.맵/PNG/Maptile_1.png'))
         except:
             pass
 
@@ -100,15 +101,15 @@ def init():
 
     # GUI 이미지 로드
     try:
-        button_image = load_image('./04.GUI/PNG/GUI_Main_Button_1_Base.png')
-        button_selected = load_image('./04.GUI/PNG/GUI_Main_Button_1.png')
-        display_panel = load_image('./04.GUI/PNG/Display_12.png')
-        gold_icon = load_image('./04.GUI/PNG/GUI_gold_1.png')
+        button_image = load_image(resource_path('./04.GUI/PNG/GUI_Main_Button_1_Base.png'))
+        button_selected = load_image(resource_path('./04.GUI/PNG/GUI_Main_Button_1.png'))
+        display_panel = load_image(resource_path('./04.GUI/PNG/Display_12.png'))
+        gold_icon = load_image(resource_path('./04.GUI/PNG/GUI_gold_1.png'))
 
         # 아이템 아이콘들 로드
         for i in range(1, 11):
             try:
-                icon_images[i] = load_image(f'./03.아이템&아이콘/PNG/Item_{i}.png')
+                icon_images[i] = load_image(resource_path(f'./03.아이템&아이콘/PNG/Item_{i}.png'))
             except:
                 pass
     except:

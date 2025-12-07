@@ -1,4 +1,5 @@
 from pico2d import *
+from resource_path import resource_path
 
 class Minimap:
     def __init__(self, x, y, width, height):
@@ -20,11 +21,11 @@ class Minimap:
         self.marker_enemy = None
 
         try:
-            self.map_bg = load_image('./04.GUI/PNG/GUI_Map.png')
-            self.map_fill = load_image('./04.GUI/PNG/GUI_Map_Fill.png')
-            self.map_line = load_image('./04.GUI/PNG/GUI_Map_Line.png')
-            self.marker_player = load_image('./04.GUI/PNG/GUI_Marker_Player.png')
-            self.marker_enemy = load_image('./04.GUI/PNG/GUI_Marker_Enmy.png')
+            self.map_bg = load_image(resource_path('./04.GUI/PNG/GUI_Map.png'))
+            self.map_fill = load_image(resource_path('./04.GUI/PNG/GUI_Map_Fill.png'))
+            self.map_line = load_image(resource_path('./04.GUI/PNG/GUI_Map_Line.png'))
+            self.marker_player = load_image(resource_path('./04.GUI/PNG/GUI_Marker_Player.png'))
+            self.marker_enemy = load_image(resource_path('./04.GUI/PNG/GUI_Marker_Enmy.png'))
         except:
             pass
 

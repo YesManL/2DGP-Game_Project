@@ -3,6 +3,7 @@ import game_framework
 import title_mode
 import shop_mode
 import math
+from resource_path import resource_path
 
 # 모듈 레벨 변수
 font = None
@@ -23,9 +24,9 @@ def init():
 
     # GUI 이미지 로드
     try:
-        display_panel = load_image('./04.GUI/PNG/Display_12.png')
-        button_image = load_image('./04.GUI/PNG/GUI_Main_Button_1.png')
-        skull_icon = load_image('./03.아이템&아이콘/PNG/Item_10.png')
+        display_panel = load_image(resource_path('./04.GUI/PNG/Display_12.png'))
+        button_image = load_image(resource_path('./04.GUI/PNG/GUI_Main_Button_1.png'))
+        skull_icon = load_image(resource_path('./03.아이템&아이콘/PNG/Item_10.png'))
     except:
         pass
 

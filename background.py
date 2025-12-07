@@ -1,10 +1,11 @@
 from pico2d import *
 import random
+from resource_path import resource_path
 
 class Background:
     def __init__(self):
         # 메인 배경 타일
-        self.image = load_image('./02.배경&프랍/4.맵/PNG/Maptile_1.png')
+        self.image = load_image(resource_path('./02.배경&프랍/4.맵/PNG/Maptile_1.png'))
         self.canvas_width = get_canvas_width()
         self.canvas_height = get_canvas_height()
         self.w = self.image.w
@@ -14,10 +15,10 @@ class Background:
         self.props = []
         try:
             prop_images = [
-                load_image('./02.배경&프랍/4.맵/PNG/Prop_Container_1.png'),
-                load_image('./02.배경&프랍/4.맵/PNG/Prop_Container_2.png'),
-                load_image('./02.배경&프랍/4.맵/PNG/Prop_Wreck_S_1.png'),
-                load_image('./02.배경&프랍/4.맵/PNG/Prop_Wreck_S_2.png'),
+                load_image(resource_path('./02.배경&프랍/4.맵/PNG/Prop_Container_1.png')),
+                load_image(resource_path('./02.배경&프랍/4.맵/PNG/Prop_Container_2.png')),
+                load_image(resource_path('./02.배경&프랍/4.맵/PNG/Prop_Wreck_S_1.png')),
+                load_image(resource_path('./02.배경&프랍/4.맵/PNG/Prop_Wreck_S_2.png')),
             ]
 
             # 랜덤하게 프랍 배치 (10~15개)
