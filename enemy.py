@@ -156,7 +156,8 @@ class Enemy:
         leg_y = self.y + math.sin(self.angle) * leg_offset
 
         # 1. 다리 먼저 그리기 (뒤에 있어야 함)
-        Enemy.leg_images[self.leg_frame].rotate_draw(draw_angle, leg_x, leg_y, self.width, self.height)
+        if 0 <= self.leg_frame < len(Enemy.leg_images):
+            Enemy.leg_images[self.leg_frame].rotate_draw(draw_angle, leg_x, leg_y, self.width, self.height)
 
         # 2. 몸통 그리기 (위에 덮어서 그려짐)
         # 피격 시 깜빡임 효과 (밝게 표시)
@@ -294,7 +295,8 @@ class BossBanditHG(Enemy):
         leg_y = self.y + math.sin(self.angle) * leg_offset
 
         # 1. 다리 먼저 그리기 (뒤에 있어야 함)
-        BossBanditHG.boss_leg_images[self.leg_frame].rotate_draw(draw_angle, leg_x, leg_y, self.width, self.height)
+        if 0 <= self.leg_frame < len(BossBanditHG.boss_leg_images):
+            BossBanditHG.boss_leg_images[self.leg_frame].rotate_draw(draw_angle, leg_x, leg_y, self.width, self.height)
 
         # 2. 몸통 그리기 (위에 덮어서 그려짐)
         if self.hit_flash > 0:
@@ -393,7 +395,8 @@ class BossBanditRPG(Enemy):
         leg_y = self.y + math.sin(self.angle) * leg_offset
 
         # 1. 다리 먼저 그리기 (뒤에 있어야 함)
-        BossBanditRPG.boss_leg_images[self.leg_frame].rotate_draw(draw_angle, leg_x, leg_y, self.width, self.height)
+        if 0 <= self.leg_frame < len(BossBanditRPG.boss_leg_images):
+            BossBanditRPG.boss_leg_images[self.leg_frame].rotate_draw(draw_angle, leg_x, leg_y, self.width, self.height)
 
         # 2. 몸통 그리기 (위에 덮어서 그려짐)
         if self.hit_flash > 0:
@@ -492,7 +495,9 @@ class BossExplosiveBullet:
             game_world.remove_object(self)
 
     def draw(self):
-        BossExplosiveBullet.images[self.frame].rotate_draw(math.radians(self.angle), self.x, self.y, self.width, self.height)
+        # 프레임 인덱스가 범위 내에 있는지 확인
+        if 0 <= self.frame < len(BossExplosiveBullet.images):
+            BossExplosiveBullet.images[self.frame].rotate_draw(math.radians(self.angle), self.x, self.y, self.width, self.height)
 
     def get_bb(self):
         return self.x - 25, self.y - 25, self.x + 25, self.y + 25
