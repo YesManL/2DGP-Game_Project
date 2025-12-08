@@ -6,13 +6,12 @@ from resource_path import resource_path
 class VolumeSettings:
     master_volume = 50  # 0~100 (기본값 50%)
     sfx_volume = 50  # 0~100 (기본값 50%)
-    music_volume = 50  # 0~100 (기본값 50%)
 
 button_press_sound = None
 bg_tile = None
 slider_bg_image = None  # 슬라이더 배경 이미지
 slider_fill_image = None  # 슬라이더 채우기 이미지
-selected_slider = 0  # 0: Master, 1: SFX, 2: Music
+selected_slider = 0  # 0: Master, 1: SFX
 animation_time = 0
 
 def init():
@@ -64,11 +63,11 @@ def handle_events():
             elif event.key == SDLK_UP or event.key == SDLK_w:
                 if button_press_sound:
                     button_press_sound.play()
-                selected_slider = (selected_slider - 1) % 3
+                selected_slider = (selected_slider - 1) % 2
             elif event.key == SDLK_DOWN or event.key == SDLK_s:
                 if button_press_sound:
                     button_press_sound.play()
-                selected_slider = (selected_slider + 1) % 3
+                selected_slider = (selected_slider + 1) % 2
             elif event.key == SDLK_LEFT or event.key == SDLK_a:
                 # 볼륨 감소
                 if button_press_sound:
@@ -77,8 +76,6 @@ def handle_events():
                     VolumeSettings.master_volume = max(0, VolumeSettings.master_volume - 5)
                 elif selected_slider == 1:
                     VolumeSettings.sfx_volume = max(0, VolumeSettings.sfx_volume - 5)
-                elif selected_slider == 2:
-                    VolumeSettings.music_volume = max(0, VolumeSettings.music_volume - 5)
                 update_all_volumes()
             elif event.key == SDLK_RIGHT or event.key == SDLK_d:
                 # 볼륨 증가
@@ -88,8 +85,6 @@ def handle_events():
                     VolumeSettings.master_volume = min(100, VolumeSettings.master_volume + 5)
                 elif selected_slider == 1:
                     VolumeSettings.sfx_volume = min(100, VolumeSettings.sfx_volume + 5)
-                elif selected_slider == 2:
-                    VolumeSettings.music_volume = min(100, VolumeSettings.music_volume + 5)
                 update_all_volumes()
 
 def update_all_volumes():
@@ -201,8 +196,8 @@ def draw():
     # 제목
     title_font.draw(canvas_width // 2 - 100, canvas_height - 80, '옵션', (255, 255, 100))
 
-    # 슬라이더 시작 위치
-    y_start = canvas_height - 180
+    # 슬라이더 시작 위치 (2개만 표시하므로 더 아래로)
+    y_start = canvas_height - 200
     slider_width = 400
     slider_height = 20
 
@@ -219,7 +214,7 @@ def draw():
     content_font.draw(canvas_width // 2 + slider_width // 2 + 30, y_pos - 30, f'{VolumeSettings.master_volume}%', color)
 
     # SFX Volume
-    y_pos -= 100
+    y_pos -= 120
     color = (255, 255, 100) if selected_slider == 1 else (255, 255, 255)
     heading_font.draw(150, y_pos + 10, '효과음 볼륨', color)
 
@@ -227,14 +222,6 @@ def draw():
     draw_slider_fill(canvas_width // 2, y_pos - 20, slider_width, slider_height, VolumeSettings.sfx_volume)
     content_font.draw(canvas_width // 2 + slider_width // 2 + 30, y_pos - 30, f'{VolumeSettings.sfx_volume}%', color)
 
-    # Music Volume
-    y_pos -= 100
-    color = (255, 255, 100) if selected_slider == 2 else (255, 255, 255)
-    heading_font.draw(150, y_pos + 10, '배경음 볼륨', color)
-
-    draw_slider_bg(canvas_width // 2, y_pos - 20, slider_width, slider_height, selected_slider == 2)
-    draw_slider_fill(canvas_width // 2, y_pos - 20, slider_width, slider_height, VolumeSettings.music_volume)
-    content_font.draw(canvas_width // 2 + slider_width // 2 + 30, y_pos - 30, f'{VolumeSettings.music_volume}%', color)
 
     # 안내 텍스트
     small_font.draw(canvas_width // 2 - 180, 60, '↑↓: 항목 선택 | ←→: 볼륨 조절', (255, 255, 100))
