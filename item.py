@@ -2,6 +2,7 @@ from pico2d import *
 import game_framework
 import game_world
 from resource_path import resource_path
+from option_mode import VolumeSettings
 
 class HPItem:
     """HP 회복 아이템"""
@@ -15,7 +16,7 @@ class HPItem:
         # 아이템 획득 사운드 로드
         if not HPItem.item_get_sound:
             HPItem.item_get_sound = load_wav(resource_path('SFX/Player/Item_Get.mp3'))
-            HPItem.item_get_sound.set_volume(30)
+            HPItem.item_get_sound.set_volume(int(VolumeSettings.sfx_volume * VolumeSettings.master_volume * 0.003))
 
         self.x, self.y = x, y
         self.width, self.height = 30, 30

@@ -18,8 +18,8 @@ animation_time = 0
 def init():
     global font, title_font, bg_image, display_panel, button_image, skull_icon, animation_time
     # Windows 기본 폰트 사용
-    font = load_font('C:/Windows/Fonts/arial.ttf', 30)
-    title_font = load_font('C:/Windows/Fonts/arial.ttf', 60)
+    font = load_font('C:/Windows/Fonts/malgun.ttf', 30)
+    title_font = load_font('C:/Windows/Fonts/malgun.ttf', 60)
     animation_time = 0
 
     # GUI 이미지 로드
@@ -68,7 +68,7 @@ def draw():
 
     # GAME OVER 텍스트 - 흔들림
     if title_font:
-        title_font.draw(int(canvas_width // 2 - 170 + shake_x), int(canvas_height // 2 + 80 + shake_y), 'GAME OVER', (255, 50, 50))
+        title_font.draw(int(canvas_width // 2 - 170 + shake_x), int(canvas_height // 2 + 80 + shake_y), '게임 오버', (255, 50, 50))
 
     # 스코어 패널 - 펄스 효과
     scale = 1.0 + math.sin(animation_time * 3) * 0.03
@@ -82,7 +82,7 @@ def draw():
 
     # 스코어 텍스트
     if font:
-        font.draw(canvas_width // 2 - 60, canvas_height // 2 - 10, f'Kills: {score}', (255, 255, 255))
+        font.draw(canvas_width // 2 - 60, canvas_height // 2 - 10, f'처치: {score}', (255, 255, 255))
 
     # 재시작 버튼 - 맥박 효과
     button_scale = 1.0 + math.sin(animation_time * 4) * 0.05
@@ -93,7 +93,7 @@ def draw():
     alpha = int((math.sin(animation_time * 5) + 1) * 127.5)
     text_color = (255, 255, min(255, alpha + 100))
     if font:
-        font.draw(canvas_width // 2 - 140, canvas_height // 2 - 130, 'Press SPACE to Restart', text_color)
+        font.draw(canvas_width // 2 - 140, canvas_height // 2 - 130, 'SPACE 키를 눌러 재시작', text_color)
 
     update_canvas()
 

@@ -2,6 +2,7 @@ from pico2d import *
 import game_framework
 import game_world
 from resource_path import resource_path
+from option_mode import VolumeSettings
 
 class Explosion:
     """폭발 이펙트 - 애니메이션 재생 후 광역 피해"""
@@ -16,7 +17,7 @@ class Explosion:
         # 폭발 사운드 로드
         if Explosion.explosion_sound is None:
             Explosion.explosion_sound = load_wav(resource_path('SFX/Player/Explosion.mp3'))
-            Explosion.explosion_sound.set_volume(40)
+            Explosion.explosion_sound.set_volume(int(VolumeSettings.sfx_volume * VolumeSettings.master_volume * 0.004))
 
         # 폭발 사운드 재생 (생성 시 즉시)
         if Explosion.explosion_sound:

@@ -4,6 +4,7 @@ import game_world
 import math
 import random
 from resource_path import resource_path
+from option_mode import VolumeSettings
 
 class Enemy:
     images = []  # Bandit_AR 이미지 리스트 (여러 변형)
@@ -38,13 +39,13 @@ class Enemy:
         if not Enemy.death_sounds:
             for i in [1, 2, 3]:
                 sound = load_wav(resource_path(f'SFX/Enemy/Enemy_Dead_{i}.mp3'))
-                sound.set_volume(30)  # 볼륨 설정 (0~128)
+                sound.set_volume(int(VolumeSettings.sfx_volume * VolumeSettings.master_volume * 0.003))  # 볼륨 설정
                 Enemy.death_sounds.append(sound)
 
         # AR 발사 사운드 로드
         if not Enemy.ar_fire_sound:
             Enemy.ar_fire_sound = load_wav(resource_path('SFX/Enemy/AR_Fire.mp3'))
-            Enemy.ar_fire_sound.set_volume(25)
+            Enemy.ar_fire_sound.set_volume(int(VolumeSettings.sfx_volume * VolumeSettings.master_volume * 0.0025))
 
         # 각 적마다 랜덤하게 이미지 선택
         self.image = random.choice(Enemy.images)
@@ -343,7 +344,7 @@ class BossBanditRPG(Enemy):
         # RPG 발사 사운드 로드
         if not BossBanditRPG.rpg_fire_sound:
             BossBanditRPG.rpg_fire_sound = load_wav(resource_path('SFX/Enemy/RPG_Fire.mp3'))
-            BossBanditRPG.rpg_fire_sound.set_volume(35)  # RPG는 좀 더 크게
+            BossBanditRPG.rpg_fire_sound.set_volume(int(VolumeSettings.sfx_volume * VolumeSettings.master_volume * 0.0035))  # RPG는 좀 더 크게
 
         # 각 특수몹마다 랜덤하게 이미지 선택
         self.image = random.choice(BossBanditRPG.boss_images)

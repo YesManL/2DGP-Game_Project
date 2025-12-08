@@ -3,6 +3,7 @@ import game_framework
 import game_world
 import math
 from resource_path import resource_path
+from option_mode import VolumeSettings
 
 # Player 이동 속도 설정
 PIXEL_PER_METER = (10.0 / 0.3)
@@ -22,12 +23,12 @@ class Player:
         # 발사 사운드 로드
         if not Player.fire_sound:
             Player.fire_sound = load_wav(resource_path('SFX/Player/Fire.mp3'))
-            Player.fire_sound.set_volume(35)
+            Player.fire_sound.set_volume(int(VolumeSettings.sfx_volume * VolumeSettings.master_volume * 0.0035))
 
         # 피격 사운드 로드
         if not Player.get_hit_sound:
             Player.get_hit_sound = load_wav(resource_path('SFX/Player/Get_Hit.mp3'))
-            Player.get_hit_sound.set_volume(40)
+            Player.get_hit_sound.set_volume(int(VolumeSettings.sfx_volume * VolumeSettings.master_volume * 0.004))
 
         # 후륜 자동차 물리 시스템
         self.chassis_angle = 0  # 차체 각도 (이동 방향)

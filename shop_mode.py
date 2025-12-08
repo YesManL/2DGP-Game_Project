@@ -2,6 +2,7 @@ from pico2d import *
 import game_framework
 import math
 from resource_path import resource_path
+from option_mode import VolumeSettings
 
 # 플레이어가 선택할 수 있는 아이템/무기
 class GameData:
@@ -33,17 +34,17 @@ class GameData:
 
 # 상점 아이템 데이터
 weapons = [
-    {'name': 'Basic Gun', 'desc': 'Standard weapon', 'price': 0, 'icon_id': 3},
-    {'name': 'Shotgun', 'desc': 'Spread shot', 'price': 500, 'icon_id': 4},
-    {'name': 'Explosive Gun', 'desc': 'Area explosion', 'price': 800, 'icon_id': 5}
+    {'name': '기본 총', 'desc': '표준 무기', 'price': 0, 'icon_id': 3},
+    {'name': '샷건', 'desc': '산탄 발사', 'price': 500, 'icon_id': 4},
+    {'name': '폭발 총', 'desc': '범위 폭발', 'price': 800, 'icon_id': 5}
 ]
 
 items = [
-    {'name': 'HP Boost', 'desc': '+50 Max HP', 'price': 300, 'icon_id': 5},
-    {'name': 'Speed Up', 'desc': '+20% Speed', 'price': 250, 'icon_id': 6},
-    {'name': 'Damage Up', 'desc': '+30% Damage', 'price': 400, 'icon_id': 3},
-    {'name': 'Fire Rate', 'desc': '+25% Fire Rate', 'price': 350, 'icon_id': 4},
-    {'name': 'HP Refill', 'desc': 'Full HP Restore', 'price': 200, 'icon_id': 7}
+    {'name': '체력 증가', 'desc': '최대 HP +50', 'price': 300, 'icon_id': 5},
+    {'name': '이동 속도 증가', 'desc': '속도 +20%', 'price': 250, 'icon_id': 6},
+    {'name': '공격력 증가', 'desc': '공격력 +30%', 'price': 400, 'icon_id': 3},
+    {'name': '연사력 증가', 'desc': '연사속도 +25%', 'price': 350, 'icon_id': 4},
+    {'name': '체력 회복', 'desc': 'HP 완전 회복', 'price': 200, 'icon_id': 7}
 ]
 
 # 상점 UI 변수
@@ -61,6 +62,48 @@ button_press_sound = None  # 버튼 선택 사운드
 start_buy_sound = None  # 구매 사운드
 bg_tile = None  # 배경 타일
 
+# 아이템 버튼 레이아웃 정의
+ITEM_BUTTON_WIDTH = 600
+ITEM_BUTTON_HEIGHT = 60
+ITEM_START_Y = lambda: get_canvas_height() - 200
+ITEM_SPACING = 75
+
+# 탭 버튼 레이아웃 정의
+TAB_Y = lambda: get_canvas_height() - 140
+TAB_WEAPON_X = lambda: get_canvas_width() // 2 - 120
+TAB_ITEM_X = lambda: get_canvas_width() // 2 + 120
+TAB_WIDTH = 200
+TAB_HEIGHT = 50
+
+def is_mouse_on_item(mx, my, item_index):
+    """마우스가 아이템 버튼 위에 있는지 확인"""
+    canvas_width = get_canvas_width()
+    y = ITEM_START_Y() - item_index * ITEM_SPACING
+
+    # 화면 밖이면 false
+    if y < 80:
+        return False
+
+    button_x = canvas_width // 2
+    left = button_x - ITEM_BUTTON_WIDTH // 2
+    right = button_x + ITEM_BUTTON_WIDTH // 2
+    top = y + ITEM_BUTTON_HEIGHT // 2
+    bottom = y - ITEM_BUTTON_HEIGHT // 2
+
+    return left <= mx <= right and bottom <= my <= top
+
+def is_mouse_on_tab(mx, my, tab_id):
+    """마우스가 탭 버튼 위에 있는지 확인 (0: 무기, 1: 아이템)"""
+    tab_x = TAB_WEAPON_X() if tab_id == 0 else TAB_ITEM_X()
+    tab_y = TAB_Y()
+
+    left = tab_x - TAB_WIDTH // 2
+    right = tab_x + TAB_WIDTH // 2
+    top = tab_y + TAB_HEIGHT // 2
+    bottom = tab_y - TAB_HEIGHT // 2
+
+    return left <= mx <= right and bottom <= my <= top
+
 def init():
     global animation_time, font, title_font, button_image, button_selected, display_panel, icon_images, gold_icon
     global selected_tab, selected_index, button_press_sound, start_buy_sound, bg_tile
@@ -73,14 +116,14 @@ def init():
     if button_press_sound is None:
         try:
             button_press_sound = load_wav(resource_path('SFX/Button_Press.mp3'))
-            button_press_sound.set_volume(40)
+            button_press_sound.set_volume(int(VolumeSettings.sfx_volume * VolumeSettings.master_volume * 0.004))
         except:
             pass
 
     if start_buy_sound is None:
         try:
             start_buy_sound = load_wav(resource_path('SFX/Start_Buy.mp3'))
-            start_buy_sound.set_volume(50)
+            start_buy_sound.set_volume(int(VolumeSettings.sfx_volume * VolumeSettings.master_volume * 0.005))
         except:
             pass
 
@@ -93,8 +136,8 @@ def init():
 
     # 폰트 로드
     try:
-        font = load_font('C:/Windows/Fonts/arial.ttf', 20)
-        title_font = load_font('C:/Windows/Fonts/arial.ttf', 40)
+        font = load_font('C:/Windows/Fonts/malgun.ttf', 20)
+        title_font = load_font('C:/Windows/Fonts/malgun.ttf', 40)
     except:
         font = None
         title_font = None
@@ -125,6 +168,43 @@ def handle_events():
     for event in events:
         if event.type == SDL_QUIT:
             game_framework.quit()
+        elif event.type == SDL_MOUSEMOTION:
+            # 마우스 움직임 - 아이템 위에 있으면 선택 (탭은 클릭만)
+            mx, my = event.x, get_canvas_height() - event.y
+
+            # 아이템 체크만 수행 (탭 전환은 클릭으로만)
+            items_to_check = weapons if selected_tab == 0 else items
+            for i in range(len(items_to_check)):
+                if is_mouse_on_item(mx, my, i):
+                    if selected_index != i:
+                        if button_press_sound:
+                            button_press_sound.play()
+                        selected_index = i
+                    break
+
+        elif event.type == SDL_MOUSEBUTTONDOWN:
+            # 마우스 클릭 - 아이템 구매 또는 탭 변경
+            if event.button == SDL_BUTTON_LEFT:
+                mx, my = event.x, get_canvas_height() - event.y
+
+                # 탭 클릭 체크
+                for tab_id in [0, 1]:
+                    if is_mouse_on_tab(mx, my, tab_id):
+                        if selected_tab != tab_id:
+                            if button_press_sound:
+                                button_press_sound.play()
+                            selected_tab = tab_id
+                            selected_index = 0
+                        return
+
+                # 아이템 클릭 체크
+                items_to_check = weapons if selected_tab == 0 else items
+                for i in range(len(items_to_check)):
+                    if is_mouse_on_item(mx, my, i):
+                        selected_index = i
+                        purchase_item()
+                        return
+
         elif event.type == SDL_KEYDOWN:
             if event.key == SDLK_ESCAPE:
                 # 상점 종료하고 플레이로 복귀 (골드와 아이템 적용)
@@ -179,16 +259,16 @@ def apply_items_and_return():
     # 구매한 아이템 효과 적용
     for item_id in GameData.selected_items:
         item = items[item_id]
-        if item['name'] == 'HP Boost':
+        if item['name'] == '체력 증가':
             player.max_hp += 50
             player.hp = min(player.hp + 50, player.max_hp)
-        elif item['name'] == 'Speed Up':
+        elif item['name'] == '이동 속도 증가':
             player.max_speed *= 1.2
-        elif item['name'] == 'Damage Up':
+        elif item['name'] == '공격력 증가':
             player.bullet_damage = int(player.bullet_damage * 1.3)
-        elif item['name'] == 'Fire Rate':
+        elif item['name'] == '연사력 증가':
             player.fire_rate = max(0.05, player.fire_rate * 0.75)
-        elif item['name'] == 'HP Refill':
+        elif item['name'] == '체력 회복':
             # 즉시 체력 풀충전
             player.hp = player.max_hp
 
@@ -229,8 +309,8 @@ def purchase_item():
         if GameData.player_gold >= item['price']:
             GameData.player_gold -= item['price']
 
-            # HP Refill은 카운트하지 않음 (즉시 효과만)
-            if item['name'] != 'HP Refill':
+            # 체력 회복은 카운트하지 않음 (즉시 효과만)
+            if item['name'] != '체력 회복':
                 # 구매 횟수 증가
                 if selected_index not in GameData.item_counts:
                     GameData.item_counts[selected_index] = 0
@@ -293,7 +373,7 @@ def draw():
         if button_image:
             button_image.draw(canvas_width // 2 - 120, tab_y, 200, 50)
     if font:
-        font.draw(canvas_width // 2 - 170, tab_y - 10, 'Weapons', (255, 255, 255))
+        font.draw(canvas_width // 2 - 150, tab_y - 10, '무기', (255, 255, 255))
 
     # 아이템 탭
     if selected_tab == 1:
@@ -303,7 +383,7 @@ def draw():
         if button_image:
             button_image.draw(canvas_width // 2 + 120, tab_y, 200, 50)
     if font:
-        font.draw(canvas_width // 2 + 80, tab_y - 10, 'Items', (255, 255, 255))
+        font.draw(canvas_width // 2 + 80, tab_y - 10, '아이템', (255, 255, 255))
 
     # 아이템 목록 표시
     items_to_show = weapons if selected_tab == 0 else items
@@ -332,25 +412,25 @@ def draw():
         if font:
             font.draw(canvas_width // 2 - 200, y + 10, item['name'], (255, 255, 255))
             # 작은 폰트 - init에서 로드한 것 사용 (매번 로드하지 않음)
-            small_font = load_font('C:/Windows/Fonts/arial.ttf', 16)
+            small_font = load_font('C:/Windows/Fonts/malgun.ttf', 16)
             small_font.draw(canvas_width // 2 - 200, y - 10, item['desc'], (200, 200, 200))
 
             # 가격 표시
             price_color = (255, 215, 0) if GameData.player_gold >= item['price'] else (255, 100, 100)
             font.draw(canvas_width // 2 + 150, y - 5, f"{item['price']}G", price_color)
 
-            # 구매 여부 표시
+            # 구매 여부 표시 - 더 오른쪽으로 이동
             if selected_tab == 0:  # 무기 탭
                 if i == GameData.selected_weapon:
-                    font.draw(canvas_width // 2 + 220, y - 5, '[Equipped]', (100, 255, 100))
+                    font.draw(canvas_width // 2 + 240, y - 5, '[장착중]', (100, 255, 100))
                 elif i in GameData.purchased_weapons:
-                    font.draw(canvas_width // 2 + 220, y - 5, '[Owned]', (150, 150, 255))
+                    font.draw(canvas_width // 2 + 240, y - 5, '[보유중]', (150, 150, 255))
             elif selected_tab == 1:  # 아이템 탭
-                # HP Refill은 카운트 표시 안함
-                if items[i]['name'] != 'HP Refill' and i in GameData.purchased_items:
+                # 체력 회복은 카운트 표시 안함
+                if items[i]['name'] != '체력 회복' and i in GameData.purchased_items:
                     # 구매 횟수 표시
                     count = GameData.item_counts.get(i, 0)
-                    font.draw(canvas_width // 2 + 220, y - 5, f'x{count}', (100, 255, 100))
+                    font.draw(canvas_width // 2 + 240, y - 5, f'x{count}', (100, 255, 100))
 
     # 하단 안내 메시지
     if display_panel:
@@ -358,7 +438,7 @@ def draw():
     if font:
         # 깜빡임 제거 - 고정된 색상 사용
         text_color = (200, 200, 200)
-        font.draw(canvas_width // 2 - 320, 35, 'Arrow Keys: Navigate | Enter: Buy | ESC: Continue Play', text_color)
+        font.draw(canvas_width // 2 - 320, 35, '방향키: 이동 | Enter: 구매 | ESC: 게임 계속하기', text_color)
 
     update_canvas()
 

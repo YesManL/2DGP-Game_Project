@@ -3,6 +3,7 @@ import game_framework
 import game_world
 import math
 from resource_path import resource_path
+from option_mode import VolumeSettings
 
 selected_upgrade = 0
 upgrades = []
@@ -26,14 +27,14 @@ def init():
     if button_press_sound is None:
         try:
             button_press_sound = load_wav(resource_path('SFX/Button_Press.mp3'))
-            button_press_sound.set_volume(40)
+            button_press_sound.set_volume(int(VolumeSettings.sfx_volume * VolumeSettings.master_volume * 0.004))
         except:
             pass
 
     # 폰트 로드 (시스템 기본 폰트 사용)
     try:
-        font = load_font('C:/Windows/Fonts/arial.ttf', 20)
-        title_font = load_font('C:/Windows/Fonts/arial.ttf', 40)
+        font = load_font('C:/Windows/Fonts/malgun.ttf', 20)
+        title_font = load_font('C:/Windows/Fonts/malgun.ttf', 40)
     except:
         font = None
         title_font = None
@@ -54,10 +55,10 @@ def init():
 
     # 업그레이드 옵션들
     upgrades = [
-        {'name': 'Damage +10', 'desc': 'Increase bullet damage', 'stat': 'damage'},
-        {'name': 'Fire Rate +20%', 'desc': 'Shoot faster', 'stat': 'fire_rate'},
-        {'name': 'HP +20', 'desc': 'Increase max HP', 'stat': 'hp'},
-        {'name': 'Speed +15%', 'desc': 'Move faster', 'stat': 'speed'}
+        {'name': '공격력 +10', 'desc': '총알 공격력 증가', 'stat': 'damage'},
+        {'name': '연사력 +20%', 'desc': '발사 속도 증가', 'stat': 'fire_rate'},
+        {'name': '체력 +20', 'desc': '최대 HP 증가', 'stat': 'hp'},
+        {'name': '이동속도 +15%', 'desc': '이동 속도 증가', 'stat': 'speed'}
     ]
 
 def finish():
@@ -119,7 +120,7 @@ def draw():
         if font:
             font.draw(canvas_width // 2 - 160, y + 5, upgrade['name'], (255, 255, 255))
             font_size = 16
-            desc_font = load_font('C:/Windows/Fonts/arial.ttf', font_size)
+            desc_font = load_font('C:/Windows/Fonts/malgun.ttf', font_size)
             desc_font.draw(canvas_width // 2 - 160, y - 15, upgrade['desc'], (200, 200, 200))
 
     # 안내 메시지 - 깜빡임 효과
@@ -129,7 +130,7 @@ def draw():
     if display_panel:
         display_panel.draw(canvas_width // 2, 80, 400, 60)
     if font:
-        font.draw(canvas_width // 2 - 150, 75, 'Press ENTER to select', text_color)
+        font.draw(canvas_width // 2 - 150, 75, 'Enter 키를 눌러 선택', text_color)
 
     update_canvas()
 

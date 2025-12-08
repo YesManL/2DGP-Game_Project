@@ -6,9 +6,9 @@ class UI:
     def __init__(self, player):
         self.player = player
         # Windows 기본 폰트 사용
-        self.font = load_font('C:/Windows/Fonts/arial.ttf', 20)
-        self.small_font = load_font('C:/Windows/Fonts/arial.ttf', 16)
-        self.title_font = load_font('C:/Windows/Fonts/arial.ttf', 16)
+        self.font = load_font('C:/Windows/Fonts/malgun.ttf', 20)
+        self.small_font = load_font('C:/Windows/Fonts/malgun.ttf', 16)
+        self.title_font = load_font('C:/Windows/Fonts/malgun.ttf', 16)
         self.wave = 1
         self.enemies_killed = 0
         self.enemies_needed = 0  # 웨이브 완료까지 남은 적 수
@@ -102,7 +102,7 @@ class UI:
             self.icon_wave.draw(info_x - 100, info_y, 25, 25)
 
         # 웨이브 번호 표시
-        self.font.draw(info_x - 80, info_y - 5, f'Wave: {self.wave}', (255, 255, 255))
+        self.font.draw(info_x - 80, info_y - 5, f'웨이브: {self.wave}', (255, 255, 255))
 
         # 처치 수 정보
         if self.display_panel:
@@ -111,13 +111,13 @@ class UI:
         if self.icon_kill:
             self.icon_kill.draw(info_x - 100, info_y - 40, 25, 25)
 
-        self.font.draw(info_x - 80, info_y - 45, f'Kills: {self.enemies_killed}', (255, 255, 255))
+        self.font.draw(info_x - 80, info_y - 45, f'처치: {self.enemies_killed}', (255, 255, 255))
 
         # 남은 적 수
         if self.enemies_needed > 0:
             if self.display_panel:
                 self.display_panel.draw(info_x, info_y - 80, 250, 35)
-            self.font.draw(info_x - 80, info_y - 85, f'Next: {self.enemies_needed}', (255, 255, 0))
+            self.font.draw(info_x - 80, info_y - 85, f'남은 적: {self.enemies_needed}', (255, 255, 0))
 
         # 골드 표시 (좌측 하단)
         import play_mode
@@ -127,7 +127,7 @@ class UI:
             self.display_panel.draw(gold_x, gold_y, 180, 40)
         if self.diamond_icon:
             self.diamond_icon.draw(gold_x - 60, gold_y, 25, 25)
-        self.font.draw(gold_x - 40, gold_y - 5, f'Gold: {play_mode.player_gold}', (255, 215, 0))
+        self.font.draw(gold_x - 40, gold_y - 5, f'골드: {play_mode.player_gold}', (255, 215, 0))
 
         # 미니맵 그리기 (게임 월드에서 적 목록을 가져와야 함)
         from enemy import Enemy
