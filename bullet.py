@@ -50,7 +50,10 @@ class Bullet:
     def draw(self):
         # VFX_Bullet_1 애니메이션 이미지로 그리기
         # 총알의 각도만큼 회전하여 그리기
-        Bullet.images[self.frame].rotate_draw(math.radians(self.angle), self.x, self.y, self.width, self.height)
+        # 프레임이 범위를 벗어나지 않도록 보호
+        if Bullet.images and len(Bullet.images) > 0:
+            frame_index = self.frame % len(Bullet.images)
+            Bullet.images[frame_index].rotate_draw(math.radians(self.angle), self.x, self.y, self.width, self.height)
 
     def get_bb(self):
         return self.x - 20, self.y - 20, self.x + 20, self.y + 20
@@ -106,7 +109,10 @@ class EnemyBullet:
 
     def draw(self):
         # 적 총알은 빨간색 틴트를 적용 (optional)
-        EnemyBullet.images[self.frame].rotate_draw(math.radians(self.angle), self.x, self.y, self.width, self.height)
+        # 프레임이 범위를 벗어나지 않도록 보호
+        if EnemyBullet.images and len(EnemyBullet.images) > 0:
+            frame_index = self.frame % len(EnemyBullet.images)
+            EnemyBullet.images[frame_index].rotate_draw(math.radians(self.angle), self.x, self.y, self.width, self.height)
 
     def get_bb(self):
         return self.x - 15, self.y - 15, self.x + 15, self.y + 15
@@ -187,7 +193,10 @@ class ExplosiveBullet:
 
     def draw(self):
         # 폭발탄은 좀 더 밝게 표시
-        ExplosiveBullet.images[self.frame].rotate_draw(math.radians(self.angle), self.x, self.y, self.width, self.height)
+        # 프레임이 범위를 벗어나지 않도록 보호
+        if ExplosiveBullet.images and len(ExplosiveBullet.images) > 0:
+            frame_index = self.frame % len(ExplosiveBullet.images)
+            ExplosiveBullet.images[frame_index].rotate_draw(math.radians(self.angle), self.x, self.y, self.width, self.height)
 
     def get_bb(self):
         return self.x - 25, self.y - 25, self.x + 25, self.y + 25
